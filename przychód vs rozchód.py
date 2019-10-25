@@ -147,10 +147,9 @@ def wykres(daty_baz, przych_rozl, daty_ban, rozch, zysk):
     # use a more precise date string for the x axis locations in the toolbar
     ax.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
     ax.set_title('fig.autofmt_xdate fixes the labels')
-    plt.plot(date_str_baza, przych_rozl, color='#001df5', label='zapłacone składki = ' + str('{:.2f}'.format(sum(przych_rozl))))
-    plt.plot(date_str_bank, rozch, color='#993344', label='koszty = '
-                                + str('{:.2f}'.format(sum(rozch))))  # marker='o'
-    plt.plot(date_str_baza[56:-1], zysk, color='#2E8B57', label='zysk = ' + str('{:.2f}'.format(sum(zysk) / 13)))
+    plt.plot(date_str_baza[:-2], przych_rozl[:-2], color='#001df5', label='zapłacone składki = ' + str('{:.2f}'.format(sum(przych_rozl))))
+    plt.plot(date_str_bank[1:], rozch[1:], color='#993344', label='koszty = ' + str('{:.2f}'.format(sum(rozch))))  # marker='o'
+    plt.plot(date_str_baza[56:-2], zysk[:-1], color='#2E8B57', label='zysk = ' + str('{:.2f}'.format(sum(zysk) / 12)))
     # plt.xlabel('rok')
     plt.ylabel('Przychód od 2014 roku w zł')
     plt.title('PRZYCHÓD AGENCJI I KOSZTY SPÓŁKI - 07.10.2019r.')
