@@ -44,7 +44,7 @@ def odczytDanychBaza():
                 prowizja_rozl = CU.value
                 przychód_rozl.append(prowizja_rozl)
 
-    return daty_baza, przychód_rozl
+    return daty_baza, przychód_rozl, BY.value
 
 
 def odczytDanychBank():
@@ -152,7 +152,7 @@ def wykres(daty_baz, przych_rozl, daty_ban, rozch, zysk):
     plt.plot(date_str_baza[56:-2], zysk[:-1], color='#2E8B57', label='zysk = ' + str('{:.2f}'.format(sum(zysk) / 12)))
     # plt.xlabel('rok')
     plt.ylabel('Przychód od 2014 roku w zł')
-    plt.title('PRZYCHÓD AGENCJI I KOSZTY SPÓŁKI - 07.10.2019r.')
+    plt.title('PRZYCHÓD AGENCJI, KOSZTY, ZYSK SPÓŁKI DO 01.09.2019r.')
     # plt.savefig(desktop + "\\przych z bazy.png")
     plt.grid(which='major', color='w', linestyle='-', linewidth=1.3)
     ax.grid(which='minor', linestyle='-', linewidth='0.7', color='w')
@@ -161,8 +161,8 @@ def wykres(daty_baz, przych_rozl, daty_ban, rozch, zysk):
 
 
 
-# sorting()
-daty_baza, przychód_rozl = odczytDanychBaza()
+sorting()
+daty_baza, przychód_rozl, BY.value = odczytDanychBaza()
 daty_bank, rozchód = odczytDanychBank()
 tpl_lista_baza = daty_przychód(daty_baza, przychód_rozl)
 tpl_lista_bank = daty_rozchód(daty_bank, rozchód)
