@@ -19,14 +19,15 @@ def odczyt_excela():
 
     id_val = []
     przypis_val = []
-    owca = []
 
     for i in range(len(OWCA)):
-        if OWCA[i].value == 'MAGRO' or OWCA[i].value == 'Robert':
-            if nazwisko_col[i].value is not None and re.search('[0-9]', str(przypis[i].value)) \
-                    and rozl[i].value == 'rozl':
-                owca.append(OWCA[i].value)
-                id_val.append(nazwisko_col[i].value)
+        ofwca = OWCA[i].value
+        nazwisko = nazwisko_col[i].value
+        rozliczone = rozl[i].value
+        if ofwca in ('MAGRO', 'Robert'):
+            if nazwisko is not None and re.search('[0-9]', str(przypis[i].value)) \
+                    and rozliczone in 'rozl':
+                id_val.append(nazwisko)
                 przypis_val.append(przypis[i].value)
 
     return wb, OWCA, nazwisko_col, id_val, przypis_val
@@ -82,7 +83,7 @@ def pokolorowanie(OWCA, nazwisko_col, nazwiska_60, nazwiska_120):
     top_120_fill = PatternFill(fgColor='BF9B30', fill_type='solid')
 
     for i in range(len(nazwisko_col)):
-        if OWCA[i].value == 'MAGRO' or OWCA[i].value == 'Robert':
+        if OWCA[i].value in ('MAGRO', 'Robert'):
             if nazwisko_col[i].value in nazwiska_60:
                 nazwisko_col[i].fill = top_60_fill
             if nazwisko_col[i].value in nazwiska_120:
@@ -124,6 +125,6 @@ tpl_lista_baza = scalenie_danych(id_val, przypis_val)
 rezultat = usunięcie_duplikatów(tpl_lista_baza)
 top_60, top_120 = sortowanie(rezultat)
 sumy_przypisu_60, nazwiska_60, sumy_przypisu_120, nazwiska_120 = sumy_nazwiska(top_60, top_120)
-pokolorowanie(OWCA, nazwisko_col, nazwiska_60, nazwiska_120)
+# pokolorowanie(OWCA, nazwisko_col, nazwiska_60, nazwiska_120)
 print(wykres_top_60(sumy_przypisu_60, nazwiska_60))
 print(wykres_top_120(sumy_przypisu_120, nazwiska_120))
