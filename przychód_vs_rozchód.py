@@ -5,12 +5,15 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.dates import MonthLocator
+import re
 
 
+start = datetime.now()
 desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
 
 
 def sorting():
+
     xlApp = Dispatch("Excel.Application")
     xlwb = xlApp.Workbooks.Open(desktop + "\\2014 BAZA MAGRO.xlsx", False, False, None)
     xlAscending = 1
@@ -26,7 +29,7 @@ def sorting():
 
 
 def odczytDanychBaza():
-    start = datetime.now()
+
     wb = load_workbook(desktop + "\\MODIFY.xlsx", read_only=True, data_only=True)
     ws = wb['BAZA 2014']
     shit = ws['BB5:CU19000']
@@ -44,22 +47,27 @@ def odczytDanychBaza():
                 prowizja_rozl = CU.value
                 przychód_rozl.append(prowizja_rozl)
 
-    return daty_baza, przychód_rozl, BY.value
+        # print(daty_baza, przychód_rozl)
+
+    return daty_baza, przychód_rozl
+
 
 
 def odczytDanychBank():
-    wb = load_workbook("M:/FIRMA MAGRO/BANKI/BZ WBK/HISTORIA/historia - kopia.xlsx", read_only=True, data_only=True)
-    ws = wb['CSV srednik (3)']
-    shit = ws['A7:H1200']
+    wb = load_workbook("M:/FIRMA MAGRO/BANKI/BZ WBK/HISTORIA/szablon_historia1.xlsx", read_only=True, data_only=True)
+    ws = wb['historia_rachunku']
+    shit = ws['A1:H1200']
 
     daty_bank = []
     rozchód = []
     for A, B, C, D, E, F, G, H in shit:
-        if A.value != 'None' and F.value < 0:
-            d = A.value[3:]
-            daty_bank.append(d)
-        if F.value < 0:
+        if re.search('[0-9]', str(A.value)) and int(F.value) < 0 or \
+                'SKŁADKA' in str(C.value) and re.search('[0-9]', str(F.value)) and int(F.value) > 0 or \
+                '94 1140 2004 0000 3802 6500 8584' in str(E.value) and 'FAKTURA' in str(C.value):
+            d = str(A.value)
+            d_pars = d[:7]
             na_plus = F.value * - 1
+            daty_bank.append(d_pars)
             rozchód.append(na_plus)
 
     return daty_bank, rozchód
@@ -113,17 +121,22 @@ def selekcjaDanych(rezultat, rezultat_bank):
     for l in rezultat_bank.values():
         rozch.append(l)
 
+    daty_ban.reverse()
+    rozch.reverse()
+
     return daty_baz, daty_ban, przych_rozl, rozch
 
 
 def zysk(przych_rozl, rozch):
-    rozch_rev = rozch[::-1]
-    zysk = [a - b for a, b in zip(przych_rozl[56:-1], rozch_rev[19:])]
+    # rozch_rev = rozch[::-1]
+    zysk = [a - b for a, b in zip(przych_rozl[56:-1], rozch[19:])]
 
     return zysk
 
 
 def wykres(daty_baz, przych_rozl, daty_ban, rozch, zysk):
+
+    print(daty_baz, daty_ban, rozch, zysk)
 
     date_str_baza = []
     date_str_bank = []
@@ -134,9 +147,8 @@ def wykres(daty_baz, przych_rozl, daty_ban, rozch, zysk):
 
     for i in daty_ban:
             if i != 'None':
-                date_str_bank.append(datetime.strptime(str(i), '%m-%Y'))
+                date_str_bank.append(datetime.strptime(str(i), '%Y-%m'))
 
-    end = datetime.now()
     plt.style.use('ggplot')
     fig, ax = plt.subplots()
     # rotate and align the tick labels so they look better
@@ -147,22 +159,28 @@ def wykres(daty_baz, przych_rozl, daty_ban, rozch, zysk):
     # use a more precise date string for the x axis locations in the toolbar
     ax.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
     ax.set_title('fig.autofmt_xdate fixes the labels')
-    plt.plot(date_str_baza[:-2], przych_rozl[:-2], color='#001df5', label='zapłacone składki = ' + str('{:.2f}'.format(sum(przych_rozl))))
-    plt.plot(date_str_bank[1:], rozch[1:], color='#993344', label='koszty = ' + str('{:.2f}'.format(sum(rozch))))  # marker='o'
-    plt.plot(date_str_baza[56:-2], zysk[:-1], color='#2E8B57', label='zysk = ' + str('{:.2f}'.format(sum(zysk) / 12)))
+    plt.plot(date_str_baza[:-1], przych_rozl[:-1], color='#001df5', label='zapłacone składki = ' + str('{:.2f}'.format(sum(przych_rozl[56:-1]) / len(przych_rozl[56:-1]))))
+    plt.plot(date_str_bank[:], rozch[:], color='#993344', label='koszty = ' + str('{:.2f}'.format(sum(rozch[19:]) / len(rozch[19:]))))
+    plt.plot(date_str_bank[20:], zysk[:], color='#2E8B57', label='zysk = ' + str('{:.2f}'.format(sum(zysk) / len(zysk))))
     # plt.xlabel('rok')
     plt.ylabel('Przychód od 2014 roku w zł')
-    plt.title('PRZYCHÓD AGENCJI, KOSZTY, ZYSK SPÓŁKI DO 01.09.2019r.')
+    plt.title('PRZYCHÓD AGENCJI, KOSZTY, ZYSK SPÓŁKI DO 01.10.2019r.')
     # plt.savefig(desktop + "\\przych z bazy.png")
     plt.grid(which='major', color='w', linestyle='-', linewidth=1.3)
     ax.grid(which='minor', linestyle='-', linewidth='0.7', color='w')
     plt.legend()
+
+    end = datetime.now()
+    time = end - start
+    print(f'Czas wykonania: {time}')
+
+    print(len(przych_rozl[:-1]), len(rozch[:]), len(zysk))
     plt.show()
 
 
 
-sorting()
-daty_baza, przychód_rozl, BY.value = odczytDanychBaza()
+# sorting()
+daty_baza, przychód_rozl = odczytDanychBaza()
 daty_bank, rozchód = odczytDanychBank()
 tpl_lista_baza = daty_przychód(daty_baza, przychód_rozl)
 tpl_lista_bank = daty_rozchód(daty_bank, rozchód)
@@ -171,12 +189,6 @@ rezultat_bank = sumaMscBank(tpl_lista_bank)
 daty_baz, daty_ban, przych_rozl, rozch = selekcjaDanych(rezultat, rezultat_bank)
 zysk = zysk(przych_rozl, rozch)
 print(wykres(daty_baz, przych_rozl, daty_ban, rozch, zysk))
-
-
-
-
-
-
 
 
 
