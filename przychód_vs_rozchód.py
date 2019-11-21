@@ -48,7 +48,7 @@ def odczytDanychBaza():
                 przychód_rozl.append(prowizja_rozl)
 
         # print(daty_baza, przychód_rozl)
-
+    print(daty_baza)
     return daty_baza, przychód_rozl
 
 
@@ -70,6 +70,7 @@ def odczytDanychBank():
             daty_bank.append(d_pars)
             rozchód.append(na_plus)
 
+    print(daty_bank)
     return daty_bank, rozchód
 
 
@@ -78,6 +79,7 @@ def daty_przychód(daty_baza, przychód_rozl):
     for i in zip(daty_baza, przychód_rozl):
         tpl_lista_baza.append(i)
 
+    print(tpl_lista_baza)
     return tpl_lista_baza
 
 
@@ -86,6 +88,7 @@ def daty_rozchód(daty_bank, rozchód):
     for i in zip(daty_bank, rozchód):
         tpl_lista_bank.append(i)
 
+    print(tpl_lista_bank)
     return tpl_lista_bank
 
 
@@ -94,6 +97,7 @@ def sumaMscBaza(tpl_lista_baza):
     for k, v in tpl_lista_baza:
         rezultat[k] = rezultat.get(k, 0) + v
 
+    print(rezultat)
     return rezultat
 
 
@@ -102,7 +106,7 @@ def sumaMscBank(tpl_lista_bank):
     rezultat_bank = {}
     for k, v in tpl_lista_bank:
         rezultat_bank[k] = rezultat_bank.get(k, 0) + v
-
+    print(rezultat_bank)
     return rezultat_bank
 
 
@@ -124,19 +128,26 @@ def selekcjaDanych(rezultat, rezultat_bank):
     daty_ban.reverse()
     rozch.reverse()
 
+    print(daty_baz)
+    print(daty_ban)
+    print(przych_rozl)
+    print(rozch)
     return daty_baz, daty_ban, przych_rozl, rozch
 
 
 def zysk(przych_rozl, rozch):
     # rozch_rev = rozch[::-1]
-    zysk = [a - b for a, b in zip(przych_rozl[56:-1], rozch[19:])]
+    zysk = [a - b for a, b in zip(przych_rozl[57:], rozch[20:])]
 
+    print(len(przych_rozl[57:]))
+    print(len(rozch[20:]))
+    print(zysk)
     return zysk
 
 
 def wykres(daty_baz, przych_rozl, daty_ban, rozch, zysk):
 
-    print(daty_baz, daty_ban, rozch, zysk)
+    # print(daty_baz, daty_ban, rozch, zysk)
 
     date_str_baza = []
     date_str_bank = []
@@ -159,12 +170,12 @@ def wykres(daty_baz, przych_rozl, daty_ban, rozch, zysk):
     # use a more precise date string for the x axis locations in the toolbar
     ax.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
     ax.set_title('fig.autofmt_xdate fixes the labels')
-    plt.plot(date_str_baza[:-1], przych_rozl[:-1], color='#001df5', label='zapłacone składki = ' + str('{:.2f}'.format(sum(przych_rozl[56:-1]) / len(przych_rozl[56:-1]))))
-    plt.plot(date_str_bank[:], rozch[:], color='#993344', label='koszty = ' + str('{:.2f}'.format(sum(rozch[19:]) / len(rozch[19:]))))
-    plt.plot(date_str_bank[20:], zysk[:], color='#2E8B57', label='zysk = ' + str('{:.2f}'.format(sum(zysk) / len(zysk))))
+    plt.plot(date_str_baza[:-1], przych_rozl[:-1], color='#001df5', label='zapłacone składki (średnia msc) = ' + str('{:.2f}'.format(sum(przych_rozl[56:-1]) / len(przych_rozl[56:-1]))))
+    plt.plot(date_str_bank[:-1], rozch[:-1], color='#993344', label='koszty (średnia msc) = ' + str('{:.2f}'.format(sum(rozch[19:-1]) / len(rozch[19:-1]))))
+    plt.plot(date_str_bank[20:-1], zysk[:-1], color='#2E8B57', label='zysk (średnia msc) = ' + str('{:.2f}'.format(sum(zysk[:-1]) / len(zysk[:-1]))))
     # plt.xlabel('rok')
     plt.ylabel('Przychód od 2014 roku w zł')
-    plt.title('PRZYCHÓD AGENCJI, KOSZTY, ZYSK SPÓŁKI DO 01.10.2019r.')
+    plt.title('PRZYCHÓD AGENCJI, KOSZTY, ZYSK SPÓŁKI DO 31.10.2019r.')
     # plt.savefig(desktop + "\\przych z bazy.png")
     plt.grid(which='major', color='w', linestyle='-', linewidth=1.3)
     ax.grid(which='minor', linestyle='-', linewidth='0.7', color='w')
