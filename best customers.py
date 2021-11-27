@@ -6,11 +6,11 @@ from matplotlib.dates import MonthLocator
 import re
 
 
-desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-
+# desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')  # Win
+desktop = '/home/robb/Desktop'  # Ubuntu
 
 def odczyt_excela():
-    wb = load_workbook(desktop + "\\2014 BAZA MAGRO.xlsx", read_only=False, data_only=True)
+    wb = load_workbook(desktop + "/2014 BAZA MAGRO.xlsx", read_only=False, data_only=True)
     ws = wb['BAZA 2014']
     OWCA = ws['G']
     nazwisko_col = ws['L']
