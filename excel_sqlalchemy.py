@@ -12,7 +12,7 @@ import pandas as pd
 
 Base = declarative_base()
 
-input = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
+file = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
 output = 'output.xlsx'
 
 engine = create_engine('sqlite:///baza_sql.db', echo=False)
@@ -21,7 +21,7 @@ pd.set_option('display.max_rows', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_columns', None)
 
-# df = pd.read_excel(input, sheet_name='BAZA 2014', header=1)
+# df = pd.read_excel(file, sheet_name='BAZA 2014', header=1)
 # new_header = df.iloc[0]
 # df = df[2:]
 # df.columns = new_header
@@ -31,15 +31,11 @@ pd.set_option('display.max_columns', None)
 #                  'Przypis': Integer()},
 #           if_exists='replace')
 #
-# results = engine.execute("""
-#                          Select * from baza
-#                          """)
-#
+# results = engine.execute("""Select Przypis from baza where Przypis > 9000""")
+# #
 # final = pd.DataFrame(results)  #, columns=df.columns[:152])
-# ## final.to_excel(output, index=False)
-#
+# # ## final.to_excel(output, index=False)
 # print(final.head())
-
 
 
 
@@ -52,18 +48,23 @@ class User(Base):
 
     def __init__(self, key, data, przypis):
         self.key = key
-        self.username = data
-        self.password = przypis
+        self.data = data
+        self.przypis = przypis
 
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 session = sessionmaker(bind=engine)()
 # results = session.query(engine).all()
-users = session.query(User).filter(User.przypis > 4000).all()
-print(f'Data                Przypis')
-for user in users:
-    print(f'{user.data} {user.przypis}')
+query = session.query(User).filter(User.key, User.data > '2021-11-01', User.przypis).all()
+
+# print(f'Index     Data                Przypis')
+# for user in query:
+#     print(f'{user.key} -> {user.data} {user.przypis}')
 
 
+# df = pd.DataFrame([(d.key, d.data, d.przypis) for d in query],
+#                   columns=['Index', 'Data', 'Przypis']).round()
 
 
+df = pd.read_sql('baza', engine)
+print(df)
