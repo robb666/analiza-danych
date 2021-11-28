@@ -4,3 +4,4 @@ baza_sql.db
 .~lock.output.xlsx#
 .ipynb_checkpoints/excel_sqlalchemy-checkpoint.py
 .ipynb_checkpoints/jupyter_excel_sqlalchemy-checkpoint.ipynb
+practice.py

@@ -6,9 +6,11 @@ from sqlalchemy import String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import func
-from sqlalchemy import DateTime
+from sqlalchemy import Date
 import sqlite3
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 Base = declarative_base()
 
@@ -23,48 +25,27 @@ pd.set_option('display.max_columns', None)
 
 # df = pd.read_excel(file, sheet_name='BAZA 2014', header=1)
 # new_header = df.iloc[0]
-# df = df[2:]
 # df.columns = new_header
+# df = df[2:]
+# df.reset_index()
 #
 # df.to_sql('baza', engine,
-#           dtype={'Data wystawienia': DateTime(),
-#                  'Przypis': Integer()},
+#           dtype={'Data wystawienia': Date,
+#                  'Przypis': Integer},
 #           if_exists='replace')
 #
 # results = engine.execute("""Select Przypis from baza where Przypis > 9000""")
-# #
+#
 # final = pd.DataFrame(results)  #, columns=df.columns[:152])
 # # ## final.to_excel(output, index=False)
 # print(final.head())
 
-
-
-class User(Base):
-    __tablename__ = 'baza'
-
-    key = Column('index', Integer, primary_key=True)
-    data = Column('Data wystawienia', DateTime())
-    przypis = Column('Przypis', Integer())
-
-    def __init__(self, key, data, przypis):
-        self.key = key
-        self.data = data
-        self.przypis = przypis
-
-
-# Base.metadata.create_all(bind=engine)
-session = sessionmaker(bind=engine)()
-# results = session.query(engine).all()
-query = session.query(User).filter(User.key, User.data > '2021-11-01', User.przypis).all()
-
-# print(f'Index     Data                Przypis')
-# for user in query:
-#     print(f'{user.key} -> {user.data} {user.przypis}')
-
-
-# df = pd.DataFrame([(d.key, d.data, d.przypis) for d in query],
-#                   columns=['Index', 'Data', 'Przypis']).round()
-
-
-df = pd.read_sql('baza', engine)
+print()
+df = pd.read_sql('Select "Data wystawienia", Przypis, Firma, Nazwisko from baza where Przypis > 6000', engine)
+df = df.fillna(df['Nazwisko'])
 print(df)
+
+# sns.set(rc={'figure.figsize': (6, 6)});fig, ax = plt.subplots();fig.autofmt_xdate()
+# ax = sns.barplot(x='Data wystawienia', y='Przypis', data=df, hue='Firma')
+# # ax.set_title('Płeć osób skladajcych zapytania.')
+# plt.show()
