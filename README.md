@@ -1,2 +1,2 @@
 # analiza-danych
-This script provides simple statistics about customers, income and costs of the company parsed from MS Excel database to Python Matplotlib chart.
+This script provides simple statistics about customers, income and costs of the company parsed from MS Excel and SQL databases to Python Matplotlib/Seaborn plots.
