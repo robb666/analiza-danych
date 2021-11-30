@@ -52,7 +52,8 @@ def msc():
     return ['styczeń', 'luty', 'marzec',
             'kwiecień', 'maj', 'czerwiec',
             'lipiec', 'sierpień', 'wrzesień',
-            'październik', 'listopad', 'grudzień']
+            'październik', 'listopad', 'grudzień'
+            ]
 
 
 def inkaso(df, msc):
@@ -65,10 +66,18 @@ def inkaso(df, msc):
     rok = [rok[:2] for rok in rok_msc if rok is not None]
 
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
-    ax = sns.lineplot(x='Strzałka czasu', y='Inkaso w PLN --> przychód', data=dff, lw=1)
+    ax = sns.lineplot(x='Strzałka czasu', y='Inkaso w PLN --> przychód', data=dff, lw=1, marker='o')
+
+
+    # plt.plot([f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], dff['Inkaso w PLN --> przychód'],
+    #           color='#008df5', label='przychody')
+
+
+    ax.grid(which='major', color='black', linewidth=0.075)
 
     ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
     ax.set_title('INKASO AGENCJI')
+    plt.legend(['inkaso'])
     plt.show()
 
 
@@ -82,11 +91,14 @@ def przypis_inkaso(df, msc):
     rok = [rok[:2] for rok in rok_msc if rok is not None]
 
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
-    ax = sns.lineplot(x='Strzałka czasu', y='Inkaso w PLN --> przychód', data=dff, lw=1)
-    ax = sns.lineplot(x='Strzałka czasu', y='Przypis', data=dff, lw=1)
+
+    ax = sns.lineplot(x='Strzałka czasu', y='Inkaso w PLN --> przychód', data=dff, lw=1, marker='o')
+    ax = sns.lineplot(x='Strzałka czasu', y='Przypis', data=dff, lw=1, marker='o')
+    ax.grid(which='major', color='black', linewidth=0.075)
 
     ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
     ax.set_title('PRZYPIS i INKASO AGENCJI')
+    plt.legend(['inkaso', 'przypis'])
     plt.show()
 
 
