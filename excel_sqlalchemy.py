@@ -80,7 +80,7 @@ def inkaso(df, msc):
 
 
 
-    plt.plot(dff['Strzałka czasu'], p(x), c="b", ls="-")
+    plt.plot(dff['Strzałka czasu'], p(x), c="red", ls="--")
 
 
 
