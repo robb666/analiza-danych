@@ -1,3 +1,4 @@
+import numpy as np
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -61,7 +62,7 @@ def inkaso(df, msc):
     df_msc = pd.Series(df['Miesiąc przypisu'].replace({'_': ''}, regex=True))
     df.insert(3, 'Strzałka czasu', df_msc)
     df = df.sort_values(by=['Strzałka czasu'])
-    dff = df.groupby(['Strzałka czasu']).sum()
+    dff = df.groupby(['Strzałka czasu']).sum().reset_index()
     rok_msc = df['Strzałka czasu'].unique()
     rok = [rok[:2] for rok in rok_msc if rok is not None]
 
@@ -69,8 +70,15 @@ def inkaso(df, msc):
     ax = sns.lineplot(x='Strzałka czasu', y='Inkaso w PLN --> przychód', data=dff, lw=1, marker='o')
 
 
-    # plt.plot([f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], dff['Inkaso w PLN --> przychód'],
-    #           color='#008df5', label='przychody')
+
+    print(dff['Strzałka czasu'], str(dff['Inkaso w PLN --> przychód']))
+    x = range(0, len(dff['Strzałka czasu']))
+    z = np.polyfit(dff['Strzałka czasu'].apply(str),
+                   dff['Inkaso w PLN --> przychód'], 1)
+    p = np.ply1d(z)
+
+    plt.plot(dff['Strzałka czasu'], p(x), c="b", ls=":")
+
 
 
     ax.grid(which='major', color='black', linewidth=0.075)
@@ -114,4 +122,4 @@ if __name__ == '__main__':
     msc = msc()
 
     inkaso(sql_df, msc)
-    przypis_inkaso(sql_df, msc)
+    # przypis_inkaso(sql_df, msc)

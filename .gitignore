@@ -5,3 +5,4 @@ baza_sql.db
 .ipynb_checkpoints/excel_sqlalchemy-checkpoint.py
 .ipynb_checkpoints/jupyter_excel_sqlalchemy-checkpoint.ipynb
 practice.py
+.idea
