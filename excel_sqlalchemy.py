@@ -69,13 +69,13 @@ def inkaso(df, msc):
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
     ax = sns.lineplot(x='Strzałka czasu', y='Inkaso w PLN --> przychód', data=dff, lw=1, marker='o')
 
-
-
+    dff['Strzałka czasu'] = dff['Strzałka czasu'].astype('float64')
     print(dff['Strzałka czasu'], str(dff['Inkaso w PLN --> przychód']))
+    print(dff.info())
     x = range(0, len(dff['Strzałka czasu']))
-    z = np.polyfit(dff['Strzałka czasu'].apply(str),
+    z = np.polyfit(dff['Strzałka czasu'],
                    dff['Inkaso w PLN --> przychód'], 1)
-    p = np.ply1d(z)
+    p = np.poly1d(z)
 
     plt.plot(dff['Strzałka czasu'], p(x), c="b", ls=":")
 
