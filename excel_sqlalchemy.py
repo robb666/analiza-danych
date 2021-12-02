@@ -77,8 +77,10 @@ def inkaso(df, msc):
     # x = range(0, len(dff['Strzałka czasu']))
     # print(x)
     curve = np.polyfit(dff['Strzałka czasu'], dff['Inkaso w PLN --> przychód'], 1)  # conajmniej dwa punkty
-    print(dff['Strzałka czasu'], dff['Inkaso w PLN --> przychód'])
     print(curve)
+    # print(dff['Strzałka czasu'], dff['Inkaso w PLN --> przychód'])
+    # print(curve)
+    # print(dff['Inkaso w PLN --> przychód'].mean())
     poly = np.poly1d(curve)
 
     new_x = []
@@ -87,7 +89,8 @@ def inkaso(df, msc):
     for i in range(len(dff['Strzałka czasu'])):
         new_x.append(i)
         calc = poly(i)
-        new_y.append(calc - 1700)
+        print(calc)
+        new_y.append(calc-6500)
 
 
     plt.plot(new_x, new_y, c="red", ls="--")
