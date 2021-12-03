@@ -74,26 +74,22 @@ def inkaso(df, msc):
 
 
     dff['Strzałka czasu'] = dff['Strzałka czasu'].astype('float64')
-    # x = range(0, len(dff['Strzałka czasu']))
-    # print(x)
-    curve = np.polyfit(dff['Strzałka czasu'], dff['Inkaso w PLN --> przychód'], 1)  # conajmniej dwa punkty
-    print(curve)
-    # print(dff['Strzałka czasu'], dff['Inkaso w PLN --> przychód'])
-    # print(curve)
-    # print(dff['Inkaso w PLN --> przychód'].mean())
+    curve = np.polyfit(dff['Strzałka czasu'], dff['Inkaso w PLN --> przychód'], 1)
     poly = np.poly1d(curve)
 
     new_x = []
     new_y = []
 
-    for i in range(len(dff['Strzałka czasu'])):
+    for i in range(59):
         new_x.append(i)
         calc = poly(i)
-        print(calc)
-        new_y.append(calc-6500)
+        new_y.append(calc)
 
-
-    plt.plot(new_x, new_y, c="red", ls="--")
+    print(len(new_y))
+    print(new_y)
+    print(len(poly(dff['Strzałka czasu'])))
+    print(poly(dff['Strzałka czasu']))
+    plt.plot(range(len(dff['Strzałka czasu'])), poly(dff['Strzałka czasu']), ls="--")
 
 
 
