@@ -53,11 +53,11 @@ def msc():
     return ['styczeń', 'luty', 'marzec',
             'kwiecień', 'maj', 'czerwiec',
             'lipiec', 'sierpień', 'wrzesień',
-            'październik', 'listopad', 'grudzień'
-            ]
+            'październik', 'listopad', 'grudzień']
 
 
 def inkaso(df, msc):
+    np.set_printoptions(suppress=True)
     df = df.rename(columns={'TU Inkaso': 'Inkaso w PLN --> przychód'})
     df_msc = pd.Series(df['Miesiąc przypisu'].replace({'_': ''}, regex=True))
     df.insert(3, 'Strzałka czasu', df_msc)
@@ -66,32 +66,14 @@ def inkaso(df, msc):
     rok_msc = df['Strzałka czasu'].unique()
     rok = [rok[:2] for rok in rok_msc if rok is not None]
 
-
-
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
     ax = sns.lineplot(x='Strzałka czasu', y='Inkaso w PLN --> przychód', data=dff, lw=1, marker='o')
 
+    time_len = range(len(dff['Strzałka czasu']))
+    model = np.polyfit(time_len, dff['Inkaso w PLN --> przychód'], 1)
+    predict = np.poly1d(model)
 
-
-    dff['Strzałka czasu'] = dff['Strzałka czasu'].astype('float64')
-    curve = np.polyfit(dff['Strzałka czasu'], dff['Inkaso w PLN --> przychód'], 1)
-    poly = np.poly1d(curve)
-
-    new_x = []
-    new_y = []
-
-    for i in range(59):
-        new_x.append(i)
-        calc = poly(i)
-        new_y.append(calc)
-
-    print(len(new_y))
-    print(new_y)
-    print(len(poly(dff['Strzałka czasu'])))
-    print(poly(dff['Strzałka czasu']))
-    plt.plot(range(len(dff['Strzałka czasu'])), poly(dff['Strzałka czasu']), ls="--")
-
-
+    plt.plot(time_len, predict(time_len), ls="--")
 
     ax.grid(which='major', color='black', linewidth=0.075)
 
