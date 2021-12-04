@@ -72,7 +72,7 @@ def inkaso(df, msc):
     time_len = range(len(dff['Strzałka czasu']))
     model = np.polyfit(time_len, dff['Inkaso w PLN --> przychód'], 1)
     predict = np.poly1d(model)
-
+    print(predict(time_len))
     plt.plot(time_len, predict(time_len), ls="--")
 
     ax.grid(which='major', color='black', linewidth=0.075)
@@ -88,16 +88,26 @@ def przypis_inkaso(df, msc):
     df_msc = pd.Series(df['Miesiąc przypisu'].replace({'_': ''}, regex=True))
     df.insert(3, 'Strzałka czasu', df_msc)
     df = df.sort_values(by=['Strzałka czasu'])
-    dff = df.groupby(['Strzałka czasu']).sum()
+    dff = df.groupby(['Strzałka czasu']).sum().reset_index()
     rok_msc = df['Strzałka czasu'].unique()
     rok = [rok[:2] for rok in rok_msc if rok is not None]
 
-    sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
+    sns.set(rc={'figure.figsize': (29, 14)});fig, ax = plt.subplots();fig.autofmt_xdate()
 
     ax = sns.lineplot(x='Strzałka czasu', y='Inkaso w PLN --> przychód', data=dff, lw=1, marker='o')
     ax = sns.lineplot(x='Strzałka czasu', y='Przypis', data=dff, lw=1, marker='o')
     ax.grid(which='major', color='black', linewidth=0.075)
 
+    time_len = range(len(dff['Strzałka czasu']))
+
+    model_inkaso = np.polyfit(time_len, dff['Inkaso w PLN --> przychód'], 1)
+    predict_inkaso = np.poly1d(model_inkaso)
+    plt.plot(time_len, predict_inkaso(time_len), ls="--")
+
+    model_przypis = np.polyfit(time_len, dff['Przypis'], 1)
+    predict_przypis = np.poly1d(model_przypis)
+    plt.plot(time_len, predict_przypis(time_len), ls="--")
+    print(predict_przypis(time_len))
     ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
     ax.set_title('PRZYPIS i INKASO AGENCJI')
     plt.legend(['inkaso', 'przypis'])
@@ -116,4 +126,4 @@ if __name__ == '__main__':
     msc = msc()
 
     inkaso(sql_df, msc)
-    # przypis_inkaso(sql_df, msc)
+    przypis_inkaso(sql_df, msc)
