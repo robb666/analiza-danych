@@ -80,7 +80,7 @@ def inkaso_agencji(df, msc):
     ax.grid(which='major', color='black', linewidth=0.075)
 
     ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
-    ax.set_title('PRZYCHÓD AGENCJI (Składki opłacone)')
+    ax.set_title('PRZYCHÓD AGENCJI (Składki zainkasowane)')
     plt.legend(['przychód'])
     plt.show()
 
@@ -114,7 +114,7 @@ def przypis_inkaso_agencji(df, msc):
     print('r2: ', r2_score(time_len, predict_przypis(time_len)))
 
     ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
-    ax.set_title('PRZYPIS i INKASO AGENCJI (Składki opłacone)')
+    ax.set_title('PRZYPIS i INKASO AGENCJI (Składki zainkasowane)')
     plt.legend(['przychód', 'przypis'])
     plt.show()
 
@@ -147,7 +147,7 @@ def inkaso_magro(df, msc):
     ax.grid(which='major', color='black', linewidth=0.075)
 
     ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
-    ax.set_title('PRZYCHÓD MAGRO -> Maciek, Robert. (Składki opłacone)')
+    ax.set_title('PRZYCHÓD MAGRO -> Maciek, Robert. (Składki zainkasowane)')
     plt.legend(['przychód'])
     plt.show()
 
@@ -191,7 +191,7 @@ def przypis_inkaso_magro(df, msc):
     print('r2: ', r2_score(time_len, predict_przypis(time_len)))
 
     ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
-    ax.set_title('PRZYPIS i PRZYCHÓD MAGRO -> Maciek, Robert. (Składki opłacone)')
+    ax.set_title('PRZYPIS i PRZYCHÓD MAGRO -> Maciek, Robert. (Składki zainkasowane)')
     plt.legend(['przychód', 'przypis'])
     plt.show()
 
