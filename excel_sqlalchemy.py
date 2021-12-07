@@ -111,8 +111,6 @@ def przypis_inkaso_agencji(df, msc):
     predict_przypis = np.poly1d(model_przypis)
     plt.plot(time_len, predict_przypis(time_len), ls="--")
 
-    print('r2: ', r2_score(time_len, predict_przypis(time_len)))
-
     ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
     ax.set_title('PRZYPIS i INKASO AGENCJI (Składki zainkasowane)')
     plt.legend(['przychód', 'przypis'])
@@ -196,6 +194,26 @@ def przypis_inkaso_magro(df, msc):
     plt.show()
 
 
+def displot_przypis(df):
+    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) & (df['TUrozlcz?'] == 'rozl')]
+    ax = sns.displot(df['Przypis'])
+    plt.ticklabel_format(style='plain', axis='x')
+    plt.show()
+
+
+def displot_rocznik(df):
+    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
+            (df['TUrozlcz?'] == 'rozl') &
+            (df['Nr rej miejscowość ulica nr'].str.len() < 9) &
+            ~(df['Nr rej miejscowość ulica nr'].str.contains('[a-z]', na=False)) &
+            (df['Rok produkcji'].str.len() == 4)]
+
+    df = df.sort_values(by='Rok produkcji')
+    ax = sns.displot(df['Rok produkcji'], kde=True)
+    ax.set_xticklabels(rotation=40)
+    plt.show()
+
+
 if __name__ == '__main__':
     excel = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
     output = 'output.xlsx'
@@ -211,3 +229,7 @@ if __name__ == '__main__':
     przypis_inkaso_agencji(sql_df, msc)
     inkaso_magro(sql_df, msc)
     przypis_inkaso_magro(sql_df, msc)
+    displot_przypis(sql_df)
+    displot_rocznik(sql_df)
+
+
