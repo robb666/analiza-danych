@@ -239,8 +239,8 @@ def rocznik_przypis(df):
 
 
 def lm_plot(df, msc):
-    """Relacja między ..."""
-    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
+    """Relacja pomiędzy ..."""
+    df = df[(df['Rozlicz skł. OWCA'].isin(['Robert'])) &
             (df['TUrozlcz?'] == 'rozl') &
             (df['Przypis'] > 0)]
     print(df.head(20))
@@ -254,9 +254,9 @@ def lm_plot(df, msc):
     # rok_msc = df['Strzałka czasu'].unique()
     # rok = [rok[:2] for rok in rok_msc if rok is not None]
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(28, 6))
     # df = df.sort_values(by=df['Data wystawienia'])
-    fig = sns.barplot(x='Data wystawienia', y='Przypis', data=df)
+    fig = sns.barplot(x='Data wystawienia', y='Przypis', data=df, ci=None)  # hue=''
     # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
     # print(df['Data wystawienia'])
 
