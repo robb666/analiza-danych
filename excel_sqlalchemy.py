@@ -196,7 +196,7 @@ def przypis_inkaso_magro(df, msc):
 
 def displot_przypis(df):
     df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) & (df['TUrozlcz?'] == 'rozl')]
-    ax = sns.displot(df['Przypis'])
+    ax = sns.displot(df['Przypis'], height=12.5)
     plt.ticklabel_format(style='plain', axis='x')
     plt.show()
 
@@ -209,10 +209,39 @@ def displot_rocznik(df):
             (df['Rok produkcji'].str.len() == 4)]
 
     df = df.sort_values(by='Rok produkcji')
-    ax = sns.displot(df['Rok produkcji'], kde=True)
+    ax = sns.displot(df['Rok produkcji'], kde=True, height=12.5)
     ax.set_xticklabels(rotation=40)
     plt.show()
 
+
+def rocznik_przypis(df):
+    """Relacja między rocznikiem auta a przypisem."""
+    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
+            (df['TUrozlcz?'] == 'rozl') &
+            (df['Nr rej miejscowość ulica nr'].str.len() < 9) &
+            ~(df['Nr rej miejscowość ulica nr'].str.contains('[a-z]', na=False)) &
+            (df['Rok produkcji'].str.len() == 4) &
+            (df['Przypis'] > 0)]
+
+    df['Rok produkcji'] = df['Rok produkcji'].astype(int)
+    ax = sns.lmplot(x='Rok produkcji', y='Przypis', data=df, height=12.5)
+    ax.set_xticklabels(rotation=40)
+    plt.show()
+
+
+def lm_plot(df):
+    """Relacja między ..."""
+    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
+            (df['TUrozlcz?'] == 'rozl') &
+            (df['Nr rej miejscowość ulica nr'].str.len() < 9) &
+            ~(df['Nr rej miejscowość ulica nr'].str.contains('[a-z]', na=False)) &
+            (df['Rok produkcji'].str.len() == 4) &
+            (df['Przypis'] > 0)]
+
+    df['Rok produkcji'] = df['Rok produkcji'].astype(int)
+    ax = sns.lmplot(x='Rok produkcji', y='Przypis', data=df, height=12.5)
+    ax.set_xticklabels(rotation=40)
+    plt.show()
 
 if __name__ == '__main__':
     excel = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
@@ -225,11 +254,12 @@ if __name__ == '__main__':
 
     msc = msc()
 
-    inkaso_agencji(sql_df, msc)
-    przypis_inkaso_agencji(sql_df, msc)
-    inkaso_magro(sql_df, msc)
-    przypis_inkaso_magro(sql_df, msc)
-    displot_przypis(sql_df)
-    displot_rocznik(sql_df)
-
+    # inkaso_agencji(sql_df, msc)
+    # przypis_inkaso_agencji(sql_df, msc)
+    # inkaso_magro(sql_df, msc)
+    # przypis_inkaso_magro(sql_df, msc)
+    # displot_przypis(sql_df)
+    # displot_rocznik(sql_df)
+    # rocznik_przypis(sql_df)
+    lm_plot(sql_df)
 
