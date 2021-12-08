@@ -209,7 +209,16 @@ def displot_rocznik(df):
             (df['Rok produkcji'].str.len() == 4)]
 
     df = df.sort_values(by='Rok produkcji')
-    ax = sns.displot(df['Rok produkcji'], kde=True, height=12.5)
+
+    x = df['Rok produkcji']
+    ax = sns.displot(x, kde=True, height=12.5)
+    ax.set_xticklabels(rotation=40)
+
+    x_int = df['Rok produkcji'].astype(int)
+    mean = x_int.mean()
+    ax = sns.displot(x_int, kde=True, height=12.5)
+    plt.axvline(mean, 0, 400, color='red')
+
     ax.set_xticklabels(rotation=40)
     plt.show()
 
@@ -229,19 +238,36 @@ def rocznik_przypis(df):
     plt.show()
 
 
-def lm_plot(df):
+def lm_plot(df, msc):
     """Relacja między ..."""
     df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
             (df['TUrozlcz?'] == 'rozl') &
-            (df['Nr rej miejscowość ulica nr'].str.len() < 9) &
-            ~(df['Nr rej miejscowość ulica nr'].str.contains('[a-z]', na=False)) &
-            (df['Rok produkcji'].str.len() == 4) &
             (df['Przypis'] > 0)]
+    print(df.head(20))
 
-    df['Rok produkcji'] = df['Rok produkcji'].astype(int)
-    ax = sns.lmplot(x='Rok produkcji', y='Przypis', data=df, height=12.5)
-    ax.set_xticklabels(rotation=40)
+    # df = df.rename(columns={'TU Inkaso': 'Inkaso w PLN --> przychód'})
+    # df_msc = pd.Series(df['Miesiąc przypisu'].replace({'_': ''}, regex=True))
+    # df.insert(3, 'Strzałka czasu', df_msc)
+    #
+    # df = df.sort_values(by=['Strzałka czasu'])
+    # dff = df.groupby(['Strzałka czasu']).sum().reset_index()
+    # rok_msc = df['Strzałka czasu'].unique()
+    # rok = [rok[:2] for rok in rok_msc if rok is not None]
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    # df = df.sort_values(by=df['Data wystawienia'])
+    fig = sns.barplot(x='Data wystawienia', y='Przypis', data=df)
+    # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
+    # print(df['Data wystawienia'])
+
+    # x_dates = pd.to_datetime(df['Początek'], format='%Y-%m-%d')
+    # x_dates = pd.DataFrame(x_dates)
+    # print(type(x_dates))
+    # ax.set_xticks(x_dates)
+    # ax.set_xticklabels(labels=x_dates, rotation=40)
+    # ax.set_xticklabels(labels=df['Data wystawienia'], rotation=40)
     plt.show()
+
 
 if __name__ == '__main__':
     excel = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
@@ -261,5 +287,5 @@ if __name__ == '__main__':
     # displot_przypis(sql_df)
     # displot_rocznik(sql_df)
     # rocznik_przypis(sql_df)
-    lm_plot(sql_df)
+    lm_plot(sql_df, msc)
 
