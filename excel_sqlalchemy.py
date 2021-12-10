@@ -257,8 +257,8 @@ def rocznik_przypis(df):
     plt.show()
 
 
-def lm_plot(df, msc):
-    """Relacja pomiędzy ..."""
+def brak_inkaso(df, msc):
+    """Relacja pomiędzy rodzaj klienta a niezpłacona składka"""
     df = df[
         # (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
             (df['TUrozlcz?'] == 'rozl') &
@@ -278,7 +278,7 @@ def lm_plot(df, msc):
     fig, ax = plt.subplots(figsize=(28, 6))
     df = df.sort_values(by=['Data wystawienia'])
     rok_msc_d = df['Data wystawienia']
-    print(rok_msc_d)
+    # print(rok_msc_d)
     fig = sns.barplot(x='Data wystawienia', y='Przypis', data=df, ci=None)  # hue=''
     # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
     # print(df['Data wystawienia'])
@@ -312,5 +312,5 @@ if __name__ == '__main__':
     # displot_przypis(sql_df)
     # displot_rocznik(sql_df)
     # rocznik_przypis(sql_df)
-    lm_plot(sql_df, msc)
+    brak_inkaso(sql_df, msc)
 
