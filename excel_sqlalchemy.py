@@ -1,4 +1,6 @@
+from typing import Tuple, Any
 
+from numpy import ndarray
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -140,6 +142,8 @@ def inkaso_magro(df, msc):
     model = np.polyfit(time_len, dff['Inkaso w PLN --> przychód'], 1)
     predict = np.poly1d(model)
 
+    print('r2 inkaso: ', r2_score(dff['Inkaso w PLN --> przychód'], predict(time_len)))
+
     plt.plot(time_len, predict(time_len), ls="--")
 
     ax.grid(which='major', color='black', linewidth=0.075)
@@ -170,7 +174,7 @@ def przypis_inkaso_magro(df, msc):
     rok_msc = df['Strzałka czasu'].unique()
     rok = [rok[:2] for rok in rok_msc if rok is not None]
 
-    sns.set(rc={'figure.figsize': (29, 14)});fig, ax = plt.subplots();fig.autofmt_xdate()
+    sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
 
     ax = sns.lineplot(x='Strzałka czasu', y='Inkaso w PLN --> przychód', data=dff, lw=1, marker='o')
     ax = sns.lineplot(x='Strzałka czasu', y='Przypis', data=dff, lw=1, marker='o')
@@ -178,15 +182,18 @@ def przypis_inkaso_magro(df, msc):
 
     time_len = range(len(dff['Strzałka czasu']))
 
-    model_inkaso = np.polyfit(time_len, dff['Inkaso w PLN --> przychód'], 1)
+    model_inkaso: tuple[ndarray, Any, ndarray] = np.polyfit(time_len, dff['Inkaso w PLN --> przychód'], 1)
     predict_inkaso = np.poly1d(model_inkaso)
     plt.plot(time_len, predict_inkaso(time_len), ls="--")
 
+    print('r2 inkaso: ', r2_score(dff['Inkaso w PLN --> przychód'], predict_inkaso(time_len)))
+
+    time_len = range(len(dff['Strzałka czasu']))
     model_przypis = np.polyfit(time_len, dff['Przypis'], 1)
     predict_przypis = np.poly1d(model_przypis)
     plt.plot(time_len, predict_przypis(time_len), ls="--")
 
-    print('r2: ', r2_score(time_len, predict_przypis(time_len)))
+    print('r2 przypis: ', r2_score(dff['Przypis'], predict_przypis(time_len)))
 
     ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
     ax.set_title('PRZYPIS i PRZYCHÓD MAGRO -> Maciek, Robert. (Składki zainkasowane)')
@@ -211,6 +218,7 @@ def displot_rocznik(df):
     df = df.sort_values(by='Rok produkcji')
 
     x = df['Rok produkcji']
+
     ax = sns.displot(x, kde=True, height=12.5)
     ax.set_xticklabels(rotation=40)
 
@@ -218,7 +226,6 @@ def displot_rocznik(df):
     mean = x_int.mean()
     ax = sns.displot(x_int, kde=True, height=12.5)
     plt.axvline(mean, 0, 400, color='red')
-
     ax.set_xticklabels(rotation=40)
     plt.show()
 
@@ -232,17 +239,31 @@ def rocznik_przypis(df):
             (df['Rok produkcji'].str.len() == 4) &
             (df['Przypis'] > 0)]
 
+    sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
+
+    df = df.sort_values(by='Rok produkcji')
+
     df['Rok produkcji'] = df['Rok produkcji'].astype(int)
-    ax = sns.lmplot(x='Rok produkcji', y='Przypis', data=df, height=12.5)
-    ax.set_xticklabels(rotation=40)
+    ax = sns.scatterplot(x='Rok produkcji', y='Przypis', data=df)
+
+    slope2, slope, intercept = np.polyfit(df['Rok produkcji'], df['Przypis'], 2)
+    line_values = [slope2 * i ** 2 + slope * i + intercept for i in df['Rok produkcji']]  # prediction
+
+    print(r2_score(df['Przypis'], line_values))
+
+    plt.plot(df['Rok produkcji'], line_values, ls="--", c='g')
+    ax.set_xticks(df['Rok produkcji'])
+    ax.set_xticklabels(labels=df['Rok produkcji'], rotation=40)
     plt.show()
 
 
 def lm_plot(df, msc):
     """Relacja pomiędzy ..."""
-    df = df[(df['Rozlicz skł. OWCA'].isin(['Robert'])) &
+    df = df[
+        # (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
             (df['TUrozlcz?'] == 'rozl') &
             (df['Przypis'] > 0)]
+
     print(df.head(20))
 
     # df = df.rename(columns={'TU Inkaso': 'Inkaso w PLN --> przychód'})
@@ -255,16 +276,20 @@ def lm_plot(df, msc):
     # rok = [rok[:2] for rok in rok_msc if rok is not None]
 
     fig, ax = plt.subplots(figsize=(28, 6))
-    # df = df.sort_values(by=df['Data wystawienia'])
+    df = df.sort_values(by=['Data wystawienia'])
+    rok_msc_d = df['Data wystawienia']
+    print(rok_msc_d)
     fig = sns.barplot(x='Data wystawienia', y='Przypis', data=df, ci=None)  # hue=''
     # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
     # print(df['Data wystawienia'])
 
-    # x_dates = pd.to_datetime(df['Początek'], format='%Y-%m-%d')
+    x_dates = pd.to_datetime(df['Początek'], format='%Y-%m-%d')
     # x_dates = pd.DataFrame(x_dates)
     # print(type(x_dates))
-    # ax.set_xticks(x_dates)
-    # ax.set_xticklabels(labels=x_dates, rotation=40)
+    ax.set_xticks(range(11803))
+
+    # print(df['Data wystawienia'].to_list)
+    ax.set_xticklabels(labels=rok_msc_d, rotation=40)
     # ax.set_xticklabels(labels=df['Data wystawienia'], rotation=40)
     plt.show()
 
