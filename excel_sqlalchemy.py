@@ -11,6 +11,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy import Date
 import datetime
+from datetime import timedelta
 import os
 import sqlite3
 from sklearn.metrics import r2_score
@@ -259,38 +260,21 @@ def rocznik_przypis(df):
 
 def brak_inkaso(df, msc):
     """Relacja pomiędzy rodzaj klienta a niezpłacona składka"""
-    df = df[
-        # (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
-            (df['TUrozlcz?'] == 'rozl') &
-            (df['Przypis'] > 0)]
+    df['TU Raty'] = pd.to_numeric(df['TU Raty'])
+    df['Data rat'] = pd.to_datetime(df['Data rat'])
 
-    print(df.head(20))
+    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
+            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=30))) &
+            (df['TU Raty'] > 0)]
 
-    # df = df.rename(columns={'TU Inkaso': 'Inkaso w PLN --> przychód'})
-    # df_msc = pd.Series(df['Miesiąc przypisu'].replace({'_': ''}, regex=True))
-    # df.insert(3, 'Strzałka czasu', df_msc)
-    #
-    # df = df.sort_values(by=['Strzałka czasu'])
-    # dff = df.groupby(['Strzałka czasu']).sum().reset_index()
-    # rok_msc = df['Strzałka czasu'].unique()
-    # rok = [rok[:2] for rok in rok_msc if rok is not None]
+    print(df)
+    sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
 
-    fig, ax = plt.subplots(figsize=(28, 6))
-    df = df.sort_values(by=['Data wystawienia'])
-    rok_msc_d = df['Data wystawienia']
-    # print(rok_msc_d)
-    fig = sns.barplot(x='Data wystawienia', y='Przypis', data=df, ci=None)  # hue=''
-    # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
-    # print(df['Data wystawienia'])
+    # dff = df.sort_values(by=['Wartość rat'])
+    ax = sns.barplot(x='Data rat', y='TU Raty', data=df, ci=None)
+    # ax.set_xticks(df['Data rat'])
+    # ax.set_xticklabels(labels=df['Data rat'], rotation=40)
 
-    x_dates = pd.to_datetime(df['Początek'], format='%Y-%m-%d')
-    # x_dates = pd.DataFrame(x_dates)
-    # print(type(x_dates))
-    ax.set_xticks(range(11803))
-
-    # print(df['Data wystawienia'].to_list)
-    ax.set_xticklabels(labels=rok_msc_d, rotation=40)
-    # ax.set_xticklabels(labels=df['Data wystawienia'], rotation=40)
     plt.show()
 
 
