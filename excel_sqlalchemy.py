@@ -1,5 +1,4 @@
 from typing import Tuple, Any
-
 from numpy import ndarray
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,6 +9,7 @@ from sqlalchemy import Integer
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy import Date
+from sqlalchemy import DateTime
 import datetime
 from datetime import timedelta
 import os
@@ -29,6 +29,7 @@ pd.set_option('display.max_columns', None)
 
 def make_sql(file):
     db_path = '/home/robb/Desktop/PROJEKTY/analiza-danych/baza_sql.db'
+
     if os.path.exists(db_path):
         return 'sqlite:///baza_sql.db'
     else:
@@ -42,10 +43,14 @@ def make_sql(file):
         df.to_sql('baza', engine,
                   dtype={
                          'Data wystawienia': Date,
+                         'Początek': Date,
+                         'Koniec': Date,
                          'Przypis': Integer,
+                         'Data rat': Date,
                          'TU Inkaso': Integer,
+                         'TU Raty': Integer,
                          },
-                  if_exists='replace')
+                  if_exists='append')
 
         return engine
 
@@ -242,6 +247,7 @@ def rocznik_przypis(df):
 
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
 
+
     df = df.sort_values(by='Rok produkcji')
 
     df['Rok produkcji'] = df['Rok produkcji'].astype(int)
@@ -260,18 +266,21 @@ def rocznik_przypis(df):
 
 def brak_inkaso(df, msc):
     """Relacja pomiędzy rodzaj klienta a niezpłacona składka"""
-    df['TU Raty'] = pd.to_numeric(df['TU Raty'])
+
     df['Data rat'] = pd.to_datetime(df['Data rat'])
 
-    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
-            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=30))) &
-            (df['TU Raty'] > 0)]
+    df = df[(df['Rozlicz skł. OWCA'].isin(['Robert'])) &
+            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=7))) &
+            # (df['TUrozlcz?'] == 'do rozl') &
+            (df['TU Raty'] > 0)
+            ]
 
-    print(df)
-    sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
+    print(df.head())
+
+    sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
 
     # dff = df.sort_values(by=['Wartość rat'])
-    ax = sns.barplot(x='Data rat', y='TU Raty', data=df, ci=None)
+    ax = sns.barplot(x='Nazwisko', y='TU Raty', data=df, cbar=True)
     # ax.set_xticks(df['Data rat'])
     # ax.set_xticklabels(labels=df['Data rat'], rotation=40)
 
