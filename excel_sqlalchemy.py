@@ -247,7 +247,6 @@ def rocznik_przypis(df):
 
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
 
-
     df = df.sort_values(by='Rok produkcji')
 
     df['Rok produkcji'] = df['Rok produkcji'].astype(int)
@@ -268,21 +267,21 @@ def brak_inkaso(df, msc):
     """Relacja pomiędzy rodzaj klienta a niezpłacona składka"""
 
     df['Data rat'] = pd.to_datetime(df['Data rat'])
+    df['Nazwisko'] = df['Nazwisko'].fillna(df['FIRMA'])
 
-    df = df[(df['Rozlicz skł. OWCA'].isin(['Robert'])) &
-            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=7))) &
+    df = df[
+        # (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
+            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=30))) &
             # (df['TUrozlcz?'] == 'do rozl') &
             (df['TU Raty'] > 0)
             ]
 
-    print(df.head())
+
 
     sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
-
-    # dff = df.sort_values(by=['Wartość rat'])
-    ax = sns.barplot(x='Nazwisko', y='TU Raty', data=df, cbar=True)
-    # ax.set_xticks(df['Data rat'])
-    # ax.set_xticklabels(labels=df['Data rat'], rotation=40)
+    # df = df.sort_values(by='index')
+    print(df.head(100))
+    ax = sns.histplot(df['TU Raty'])
 
     plt.show()
 
