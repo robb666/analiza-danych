@@ -270,18 +270,16 @@ def brak_inkaso(df, msc):
     df['Nazwisko'] = df['Nazwisko'].fillna(df['FIRMA'])
 
     df = df[
-        # (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
+        # (df['Rozlicz skł. OWCA'].isin(['Robert'])) &
             (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=30))) &
-            # (df['TUrozlcz?'] == 'do rozl') &
+            (df['TUrozlcz?'] == 'do rozl') &
             (df['TU Raty'] > 0)
             ]
 
-
-
     sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
     # df = df.sort_values(by='index')
-    print(df.head(100))
-    ax = sns.histplot(df['TU Raty'])
+    print(df)
+    ax = sns.histplot(x='Data rat', data=df, bins=58)
 
     plt.show()
 
