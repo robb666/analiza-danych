@@ -47,6 +47,7 @@ def make_sql(file):
                          'Koniec': Date,
                          'Przypis': Integer,
                          'Data rat': Date,
+                         'Data inkasa': Date,
                          'TU Inkaso': Integer,
                          'TU Raty': Integer,
                          },
@@ -266,28 +267,29 @@ def rocznik_przypis(df):
 def brak_inkaso(df, msc):
     """Relacja pomiędzy rodzajem klienta a niezpłacona składka"""
 
-    # df['Data rat'] = pd.to_datetime(df['Data rat'])
+    df['Data rat'] = pd.to_datetime(df['Data rat'])
     df['Nazwisko'] = df['Nazwisko'].fillna(df['FIRMA'])
 
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['Robert'])) &
-            # (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=14))) &
-            (df['TUrozlcz?'] == 'do rozl') &
-            (df['TU Raty'] > 0)
+            (df['Data rat'] <= (datetime.datetime.today() + timedelta(days=18)))
+            # (df['TUrozlcz?'] == 'do rozl') &
+            # (df['TU Raty'] > 0)
             ]
 
+
+    zakres_dat = pd.date_range('2017', '2021.12')  #, freq='MS')
+    print(zakres_dat)
+    print((datetime.datetime.today() + timedelta(days=18)))
+    I_rej_lista = zakres_dat.strftime('%d.%m.%Y')
+
     sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
-
-    df['Data rat'] = df['Data rat'].replace('-|\d\d$', '', regex=True)
-    df = df.sort_values(by=['Data rat'])
-    rok_msc = df['Data rat'].unique()
-    data_rat_num = pd.to_numeric(df['Data rat'])
-    df.insert(3, 'Data rat num', data_rat_num)
+    df.insert(1, 'Zakres dat', zakres_dat[:1034])
     print(df)
+    dff = df.groupby(['Zakres dat']).sum().reset_index()
+    # rok = [rok for rok in rok_msc if rok is not None]
 
-    rok = [rok for rok in rok_msc if rok is not None]
-
-    ax = sns.regplot(x='Data rat num', y='TU Raty', data=df, ci=True)
+    ax = sns.regplot(x=pd.to_numeric(zakres_dat[:1034]), y='TU Raty', data=dff, ci=True)
 
     # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
 
@@ -313,4 +315,3 @@ if __name__ == '__main__':
     # displot_rocznik(sql_df)   <--- szkolka
     # rocznik_przypis(sql_df)
     brak_inkaso(sql_df, msc)
-
