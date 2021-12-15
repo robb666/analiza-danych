@@ -18,6 +18,7 @@ from sklearn.metrics import r2_score
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib import dates
 import seaborn as sns
 from itertools import cycle
 
@@ -272,26 +273,56 @@ def brak_inkaso(df, msc):
 
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['Robert'])) &
-            (df['Data rat'] <= (datetime.datetime.today() + timedelta(days=18)))
-            # (df['TUrozlcz?'] == 'do rozl') &
-            # (df['TU Raty'] > 0)
+            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=14))) &
+            # (df['TUrozlcz?'] == 'do rozl')
+            (df['TU Raty'] > 0)
             ]
 
 
-    zakres_dat = pd.date_range('2017', '2021.12')  #, freq='MS')
-    print(zakres_dat)
-    print((datetime.datetime.today() + timedelta(days=18)))
-    I_rej_lista = zakres_dat.strftime('%d.%m.%Y')
 
-    sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
-    df.insert(1, 'Zakres dat', zakres_dat[:1034])
-    print(df)
-    dff = df.groupby(['Zakres dat']).sum().reset_index()
+    all_dates = pd.date_range('2017', '2021.12.01').astype(str)  #, freq='MS')
+    print(all_dates)
+    zakres_dat = dates.datestr2num(all_dates)
+
+    """Tylko trzy kolumny w df"""
+    # @plt.FuncFormatter
+    # def fake_dates(x, pos):
+    #     """Custom formater to turn floats into e.g., 2016-05-08"""
+    #     return dates.num2date(x).strftime('%Y-%m-%d')
+    #
+    # sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
+
+    # print(df.head(6))
+    df1 = df[['Data rat', 'TU Raty']].reset_index()
+    print(df1.head())
+    df_dates = pd.DataFrame({'All dates': all_dates,
+                             'All occurences': 0})
+    print(df_dates.head())
+    # df_final = df_dates[(df1['Data rat'].isin(df_dates['All dates']))]
+    df_final = df1.set_index(df1['Data rat'].dt.date).join(df_dates.set_index('All dates')).reset_index(drop=True)
+    print(df_final)
+    """fillna(0)"""
+
+
+    dff = df1.groupby(['TU Raty', 'Data rat']).sum().reset_index()
+    print(dff)
+    # df1.insert(1, 'all_dates', all_dates)
+    # print(df1, all_dates)
+
+    # dff = df.groupby(['Data rat']).sum().reset_index()
+
     # rok = [rok for rok in rok_msc if rok is not None]
 
-    ax = sns.regplot(x=pd.to_numeric(zakres_dat[:1034]), y='TU Raty', data=dff, ci=True)
+    # ax = sns.regplot(x=pd.to_numeric(zakres_dat[:1024]), y='TU Raty', data=dff, ci=True)
+    ax = sns.regplot(x='zakres_dat', y='TU Raty', data=dff)
 
     # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
+
+    # here's the magic:
+    ax.xaxis.set_major_formatter(fake_dates)
+
+    # legible labels
+    ax.tick_params(labelrotation=45)
 
     plt.show()
 
