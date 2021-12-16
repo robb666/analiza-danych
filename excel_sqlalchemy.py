@@ -268,12 +268,12 @@ def rocznik_przypis(df):
 def brak_inkaso(df, msc):
     """Relacja pomiędzy rodzajem klienta a niezpłacona składka"""
 
-    df['Data rat'] = pd.to_datetime(df['Data rat'])
+    # df['Data rat'] = pd.to_datetime(df['Data rat'])
     df['Nazwisko'] = df['Nazwisko'].fillna(df['FIRMA'])
 
-    df = df[
+    df1 = df[
             (df['Rozlicz skł. OWCA'].isin(['Robert'])) &
-            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=14))) &
+            # (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=14))) &
             # (df['TUrozlcz?'] == 'do rozl')
             (df['TU Raty'] > 0)
             ]
@@ -292,29 +292,14 @@ def brak_inkaso(df, msc):
     #
     # sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
 
-    # print(df.head(6))
-    df1 = df[['Data rat', 'TU Raty']].reset_index()
-    print(df1.head())
-    df_dates = pd.DataFrame({'All dates': all_dates,
-                             'All occurences': 0})
-    print(df_dates.head())
-    # df_final = df_dates[(df1['Data rat'].isin(df_dates['All dates']))]
-    df_final = df1.set_index(df1['Data rat'].dt.date).join(df_dates.set_index('All dates')).reset_index(drop=True)
-    print(df_final)
-    """fillna(0)"""
+    df2 = pd.DataFrame({'Data rat': pd.date_range('2017', '2021.12.01').astype(str),
+                        'Y': 0})
 
+    df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
 
-    dff = df1.groupby(['TU Raty', 'Data rat']).sum().reset_index()
-    print(dff)
-    # df1.insert(1, 'all_dates', all_dates)
-    # print(df1, all_dates)
+    print(df3)
 
-    # dff = df.groupby(['Data rat']).sum().reset_index()
-
-    # rok = [rok for rok in rok_msc if rok is not None]
-
-    # ax = sns.regplot(x=pd.to_numeric(zakres_dat[:1024]), y='TU Raty', data=dff, ci=True)
-    ax = sns.regplot(x='zakres_dat', y='TU Raty', data=dff)
+    ax = sns.regplot(x='zakres_dat', y='TU Raty', data=df3)
 
     # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
 
