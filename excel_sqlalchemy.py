@@ -273,16 +273,14 @@ def brak_inkaso(df, msc):
 
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['Robert'])) &
-            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=14))) &
+            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=16))) &
             # (df['TUrozlcz?'] == 'do rozl')
             (df['TU Raty'] > 0)
             ]
 
-
-
-    all_dates = pd.date_range('2017', '2021.12.01').astype(str)  #, freq='MS')
-    print(all_dates)
-    zakres_dat = dates.datestr2num(all_dates)
+    all_dates = pd.date_range('2017', '2021.12.04').to_pydatetime()
+    all_dates_zak = pd.date_range('2017', '2021.12.15').astype(str)
+    x = dates.datestr2num(all_dates_zak)
 
     @plt.FuncFormatter
     def fake_dates(x, pos):
@@ -293,14 +291,23 @@ def brak_inkaso(df, msc):
 
     df1 = df[['Data rat', 'TU Raty']]
 
-    df2 = pd.DataFrame({'Data rat': pd.date_range('2017', '2021.12.01').astype(str),
+    print(df1.head())
+
+    df2 = pd.DataFrame({'Data rat': all_dates,
                         'Y': 0})
+
+    print(df2.head())
+
+
 
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
     df3 = df3[['Data rat', 'TU Raty']].fillna(0)
+
+    # df3['TU Raty'] = df3['TU Raty'].astype(str)
+
     print(df3.head(200))
 
-    ax = sns.regplot(x='Data rat', y='TU Raty', data=df3)
+    ax = sns.regplot(x=x, y='TU Raty', data=df3)
 
     # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
 
