@@ -278,7 +278,7 @@ def brak_inkaso(df, msc):
             (df['TU Raty'] > 0)
             ]
 
-    all_dates = pd.date_range('2017', '2021.12.04').to_pydatetime()
+    all_dates = pd.date_range('2017', '2021.12.04').to_pydatetime()  # ?????????????
     all_dates_zak = pd.date_range('2017', '2021.12.15').astype(str)
     x = dates.datestr2num(all_dates_zak)
 
@@ -287,7 +287,7 @@ def brak_inkaso(df, msc):
         """Custom formater to turn floats into e.g., 2016-05-08"""
         return dates.num2date(x).strftime('%Y-%m-%d')
 
-    sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
+    sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
 
     df1 = df[['Data rat', 'TU Raty']]
 
@@ -298,10 +298,11 @@ def brak_inkaso(df, msc):
 
     print(df2.head())
 
-
+    """ - Dodać kategorie 'hue' na każdą OFWCA
+        - co z różnicą dat ??"""
 
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
-    df3 = df3[['Data rat', 'TU Raty']].fillna(0)
+    df3 = df3[['Data rat', 'TU Raty']]
 
     # df3['TU Raty'] = df3['TU Raty'].astype(str)
 
