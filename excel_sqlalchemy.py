@@ -268,12 +268,12 @@ def rocznik_przypis(df):
 def brak_inkaso(df, msc):
     """Relacja pomiędzy rodzajem klienta a niezpłacona składka"""
 
-    # df['Data rat'] = pd.to_datetime(df['Data rat'])
+    df['Data rat'] = pd.to_datetime(df['Data rat'])
     df['Nazwisko'] = df['Nazwisko'].fillna(df['FIRMA'])
 
-    df1 = df[
+    df = df[
             (df['Rozlicz skł. OWCA'].isin(['Robert'])) &
-            # (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=14))) &
+            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=14))) &
             # (df['TUrozlcz?'] == 'do rozl')
             (df['TU Raty'] > 0)
             ]
@@ -284,22 +284,23 @@ def brak_inkaso(df, msc):
     print(all_dates)
     zakres_dat = dates.datestr2num(all_dates)
 
-    """Tylko trzy kolumny w df"""
-    # @plt.FuncFormatter
-    # def fake_dates(x, pos):
-    #     """Custom formater to turn floats into e.g., 2016-05-08"""
-    #     return dates.num2date(x).strftime('%Y-%m-%d')
-    #
-    # sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
+    @plt.FuncFormatter
+    def fake_dates(x, pos):
+        """Custom formater to turn floats into e.g., 2016-05-08"""
+        return dates.num2date(x).strftime('%Y-%m-%d')
+
+    sns.set(rc={'figure.figsize': (29, 7)});sns.set_style('darkgrid');fig, ax = plt.subplots();fig.autofmt_xdate()
+
+    df1 = df[['Data rat', 'TU Raty']]
 
     df2 = pd.DataFrame({'Data rat': pd.date_range('2017', '2021.12.01').astype(str),
                         'Y': 0})
 
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
+    df3 = df3[['Data rat', 'TU Raty']].fillna(0)
+    print(df3.head(200))
 
-    print(df3)
-
-    ax = sns.regplot(x='zakres_dat', y='TU Raty', data=df3)
+    ax = sns.regplot(x='Data rat', y='TU Raty', data=df3)
 
     # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
 
