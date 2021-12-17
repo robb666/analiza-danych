@@ -269,17 +269,23 @@ def brak_inkaso(df, msc):
     """Relacja pomiędzy rodzajem klienta a niezpłacona składka"""
 
     df['Data rat'] = pd.to_datetime(df['Data rat'])
+    # df = df.sort_values(by=['Data rat'])
     df['Nazwisko'] = df['Nazwisko'].fillna(df['FIRMA'])
 
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['Robert'])) &
-            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=16))) &
+            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=17))) &
             # (df['TUrozlcz?'] == 'do rozl')
             (df['TU Raty'] > 0)
             ]
 
-    all_dates = pd.date_range('2017', '2021.12.04').to_pydatetime()  # ?????????????
-    all_dates_zak = pd.date_range('2017', '2021.12.15').astype(str)
+    # print(df['Data rat'])
+    all_dates = pd.date_range('2017', '2021.12.06').to_pydatetime()  # Y
+    # print(all_dates)
+
+    all_dates_zak = pd.date_range('2017', '2021.12.17').astype(str)  # X
+    # print(all_dates_zak)
+
     x = dates.datestr2num(all_dates_zak)
 
     @plt.FuncFormatter
@@ -291,12 +297,12 @@ def brak_inkaso(df, msc):
 
     df1 = df[['Data rat', 'TU Raty']]
 
-    print(df1.head())
+    # print(df1)
 
     df2 = pd.DataFrame({'Data rat': all_dates,
                         'Y': 0})
 
-    print(df2.head())
+    # print(df2)
 
     """ - Dodać kategorie 'hue' na każdą OFWCA
         - co z różnicą dat ??"""
@@ -304,20 +310,18 @@ def brak_inkaso(df, msc):
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
     df3 = df3[['Data rat', 'TU Raty']]
 
-    # df3['TU Raty'] = df3['TU Raty'].astype(str)
+    print(df3)
 
-    print(df3.head(200))
+    print(len(x), len(df3['TU Raty']))
 
     ax = sns.regplot(x=x, y='TU Raty', data=df3)
 
-    # ax.set_xticklabels(labels=[f'\'{rok} {msc}' for rok, msc in zip(rok, cycle(msc))], rotation=40)
-
     # here's the magic:
+    print(fake_dates)
     ax.xaxis.set_major_formatter(fake_dates)
 
     # legible labels
     ax.tick_params(labelrotation=45)
-
     plt.show()
 
 
