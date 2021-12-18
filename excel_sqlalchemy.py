@@ -280,6 +280,7 @@ def brak_inkaso(df):
 
     all_dates = pd.date_range('2017', '2021.12.01').to_pydatetime()
 
+
     print(df.head())
     @plt.FuncFormatter
     def fake_dates(x, pos):
@@ -291,7 +292,7 @@ def brak_inkaso(df):
     df1 = df[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
     df2 = pd.DataFrame({'Data rat': all_dates})
 
-    """ - Dodać kategorie 'hue' na każdą OFWCA """
+    """ - Dodać kategorie 'hue' na każdą OFWCA  , dtype='datetime64[ns]'"""
 
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
     df3 = df3[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
@@ -301,23 +302,26 @@ def brak_inkaso(df):
 
 
     """dtype: float64 vs Name: TU Raty, dtype: float64 = TypeError: Invalid comparison between dtype=float64 and str"""
-    x = pd.Series(x)
-    # df3['TU Raty'] = df3['TU Raty'].astype('Int64', errors='ignore')
-    print(df3['TU Raty'])
-    print(x)
-
-    print(type(x), type(df3['TU Raty']))
 
 
 
+    new_arr = df3['TU Raty'].to_numpy()
 
-    ax = sns.lmplot(x=x, y='TU Raty', data=df3)#, hue='Rozlicz skł. OWCA')
+    print(type(x), type(new_arr))
+    print(df3)
+
+    df4 = pd.DataFrame({'Data rat': x,
+                        'TU Raty': new_arr,
+                        'Rozlicz skł. OWCA': df3['Rozlicz skł. OWCA']})
+
+
+    ax = sns.lmplot(x='Data rat', y='TU Raty', data=df4, hue='Rozlicz skł. OWCA')
 
     # here's the magic:
-    ax.xaxis.set_major_formatter(fake_dates)
+    # ax.xaxis.set_major_formatter(fake_dates)
 
     # legible labels
-    ax.tick_params(labelrotation=45)
+    # ax.tick_params(labelrotation=45)
     plt.show()
 
 
