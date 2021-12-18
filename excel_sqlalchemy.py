@@ -288,7 +288,6 @@ def brak_inkaso(df, msc):
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
 
     df1 = df[['Data rat', 'TU Raty']]
-
     df2 = pd.DataFrame({'Data rat': all_dates,
                         'Y': 0})
 
@@ -299,8 +298,6 @@ def brak_inkaso(df, msc):
 
     x = dates.datestr2num(df3['Data rat'].astype(str))
     print(df3)
-
-    print(len(x), len(df3['TU Raty']))
 
     ax = sns.regplot(x=x, y='TU Raty', data=df3)
 
