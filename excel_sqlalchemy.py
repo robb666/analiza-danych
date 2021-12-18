@@ -274,7 +274,7 @@ def brak_inkaso(df):
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
             (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=18))) &
-            # (df['TUrozlcz?'] == 'do rozl')
+            # (df['TUrozlcz?'] == 'do rozl') &
             (df['TU Raty'] > 0)
             ]
 
