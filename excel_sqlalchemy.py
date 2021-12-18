@@ -265,7 +265,7 @@ def rocznik_przypis(df):
     plt.show()
 
 
-def brak_inkaso(df, msc):
+def brak_inkaso(df):
     """Relacja pomiędzy rodzajem klienta a niezpłacona składka"""
 
     df['Data rat'] = pd.to_datetime(df['Data rat'])
@@ -297,9 +297,21 @@ def brak_inkaso(df, msc):
     df3 = df3[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
 
     x = dates.datestr2num(df3['Data rat'].astype(str))
-    print(df3)
 
-    ax = sns.lmplot(x=x, y='TU Raty', data=df3, hue='Rozlicz skł. OWCA')
+
+
+    """dtype: float64 vs Name: TU Raty, dtype: float64"""
+    x = pd.Series(x)
+    # df3['TU Raty'] = df3['TU Raty'].astype('Int64', errors='ignore')
+    print(df3['TU Raty'])
+    print(x)
+
+    print(type(x), type(df3['TU Raty']))
+
+
+
+
+    ax = sns.lmplot(x=x, y='TU Raty', data=df3)#, hue='Rozlicz skł. OWCA')
 
     # here's the magic:
     ax.xaxis.set_major_formatter(fake_dates)
@@ -327,4 +339,4 @@ if __name__ == '__main__':
     # displot_przypis(sql_df)
     # displot_rocznik(sql_df)   <--- szkolka
     # rocznik_przypis(sql_df)
-    brak_inkaso(sql_df, msc)
+    brak_inkaso(sql_df)
