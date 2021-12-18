@@ -269,24 +269,16 @@ def brak_inkaso(df, msc):
     """Relacja pomiędzy rodzajem klienta a niezpłacona składka"""
 
     df['Data rat'] = pd.to_datetime(df['Data rat'])
-    # df = df.sort_values(by=['Data rat'])
     df['Nazwisko'] = df['Nazwisko'].fillna(df['FIRMA'])
 
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['Robert'])) &
-            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=17))) &
+            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=18))) &
             # (df['TUrozlcz?'] == 'do rozl')
             (df['TU Raty'] > 0)
             ]
 
-    # print(df['Data rat'])
-    all_dates = pd.date_range('2017', '2021.12.06').to_pydatetime()  # Y
-    # print(all_dates)
-
-    all_dates_zak = pd.date_range('2017', '2021.12.17').astype(str)  # X
-    # print(all_dates_zak)
-
-    # x = dates.datestr2num(all_dates_zak)
+    all_dates = pd.date_range('2017', '2021.12.01').to_pydatetime()
 
     @plt.FuncFormatter
     def fake_dates(x, pos):
@@ -297,15 +289,10 @@ def brak_inkaso(df, msc):
 
     df1 = df[['Data rat', 'TU Raty']]
 
-    # print(df1)
-
     df2 = pd.DataFrame({'Data rat': all_dates,
                         'Y': 0})
 
-    # print(df2)
-
-    """ - Dodać kategorie 'hue' na każdą OFWCA
-        - co z różnicą dat ??"""
+    """ - Dodać kategorie 'hue' na każdą OFWCA """
 
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
     df3 = df3[['Data rat', 'TU Raty']]
