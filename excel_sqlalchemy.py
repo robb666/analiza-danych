@@ -280,7 +280,7 @@ def brak_inkaso(df, msc):
 
     all_dates = pd.date_range('2017', '2021.12.01').to_pydatetime()
 
-    # print(df.head())
+    print(df.head())
     @plt.FuncFormatter
     def fake_dates(x, pos):
         """Custom formater to turn floats into e.g., 2016-05-08"""
@@ -294,14 +294,12 @@ def brak_inkaso(df, msc):
     """ - Dodać kategorie 'hue' na każdą OFWCA """
 
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
-    df3 = df3.reindex(columns=['Data rat', 'TU Raty', 'Rozlicz skł. OWCA'])
     df3 = df3[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
 
     x = dates.datestr2num(df3['Data rat'].astype(str))
-    print(x)
     print(df3)
 
-    ax = sns.regplot(x=x, y='TU Raty', data=df3)#, hue='Rozlicz skł. OWCA')
+    ax = sns.lmplot(x=x, y='TU Raty', data=df3, hue='Rozlicz skł. OWCA')
 
     # here's the magic:
     ax.xaxis.set_major_formatter(fake_dates)
