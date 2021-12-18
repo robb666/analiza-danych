@@ -300,7 +300,7 @@ def brak_inkaso(df):
 
 
 
-    """dtype: float64 vs Name: TU Raty, dtype: float64"""
+    """dtype: float64 vs Name: TU Raty, dtype: float64 = TypeError: Invalid comparison between dtype=float64 and str"""
     x = pd.Series(x)
     # df3['TU Raty'] = df3['TU Raty'].astype('Int64', errors='ignore')
     print(df3['TU Raty'])
