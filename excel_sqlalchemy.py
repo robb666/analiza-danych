@@ -286,7 +286,7 @@ def brak_inkaso(df, msc):
     all_dates_zak = pd.date_range('2017', '2021.12.17').astype(str)  # X
     # print(all_dates_zak)
 
-    x = dates.datestr2num(all_dates_zak)
+    # x = dates.datestr2num(all_dates_zak)
 
     @plt.FuncFormatter
     def fake_dates(x, pos):
@@ -310,6 +310,7 @@ def brak_inkaso(df, msc):
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
     df3 = df3[['Data rat', 'TU Raty']]
 
+    x = dates.datestr2num(df3['Data rat'].astype(str))
     print(df3)
 
     print(len(x), len(df3['TU Raty']))
