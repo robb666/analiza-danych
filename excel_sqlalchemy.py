@@ -292,17 +292,15 @@ def brak_inkaso(df):
     df1 = df[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
     df2 = pd.DataFrame({'Data rat': all_dates})
 
-    """ - Dodać kategorie 'hue' na każdą OFWCA  , dtype='datetime64[ns]'"""
+    """ - jeden, wiekszy ax,
+        - AUTOMATCZNE DATY,
+        - widoczne dane x na wykresie 
+    """
 
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
     df3 = df3[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
 
     x = dates.datestr2num(df3['Data rat'].astype(str))
-
-
-
-    """dtype: float64 vs Name: TU Raty, dtype: float64 = TypeError: Invalid comparison between dtype=float64 and str"""
-
 
 
     new_arr = df3['TU Raty'].to_numpy()
@@ -333,7 +331,6 @@ def brak_inkaso(df):
     # ax.tick_params(labelrotation=45)
 
     # plt.close(1)
-
     plt.show()
 
 
