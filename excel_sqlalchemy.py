@@ -281,13 +281,13 @@ def brak_inkaso(df):
     all_dates = pd.date_range('2017', '2021.12.01').to_pydatetime()
 
 
-    print(df.head())
-    @plt.FuncFormatter
-    def fake_dates(x, pos):
-        """Custom formater to turn floats into e.g., 2016-05-08"""
-        return dates.num2date(x).strftime('%Y-%m-%d')
+    # print(df.head())
+    # @plt.FuncFormatter
+    # def fake_dates(x, pos):
+    #     """Custom formater to turn floats into e.g., 2016-05-08"""
+    #     return dates.num2date(x).strftime('%Y-%m-%d')
 
-    sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
+    sns.set(rc={'figure.figsize': (29, 7)});#fig, ax = plt.subplots();fig.autofmt_xdate()
 
     df1 = df[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
     df2 = pd.DataFrame({'Data rat': all_dates})
@@ -307,8 +307,8 @@ def brak_inkaso(df):
 
     new_arr = df3['TU Raty'].to_numpy()
 
-    print(type(x), type(new_arr))
-    print(df3)
+    # print(type(x), type(new_arr))
+    # print(df3)
 
     df4 = pd.DataFrame({'Data rat': x,
                         'TU Raty': new_arr,
@@ -317,11 +317,24 @@ def brak_inkaso(df):
 
     ax = sns.lmplot(x='Data rat', y='TU Raty', data=df4, hue='Rozlicz skł. OWCA')
 
+
+    arr = []
+    for i in dates.num2date(x):
+        arr.append(i)
+
+    print(len(arr))
+    dats = [i.strftime('%Y-%m-%d') for i in arr[0:1859:186]]
+
+    ax.set_xticklabels(dats, rotation=45)
     # here's the magic:
+    # ax.xaxis.set_major_formatter(fake_dates)
     # ax.xaxis.set_major_formatter(fake_dates)
 
     # legible labels
     # ax.tick_params(labelrotation=45)
+
+    # plt.close(1)
+
     plt.show()
 
 
