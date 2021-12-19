@@ -322,12 +322,11 @@ def brak_inkaso(df):
     for i in dates.num2date(x):
         arr.append(i)
 
-    print(len(arr))
+    # print(len(arr))
     dats = [i.strftime('%Y-%m-%d') for i in arr[0:1859:186]]
-
     ax.set_xticklabels(dats, rotation=45)
+
     # here's the magic:
-    # ax.xaxis.set_major_formatter(fake_dates)
     # ax.xaxis.set_major_formatter(fake_dates)
 
     # legible labels
