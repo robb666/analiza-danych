@@ -1,19 +1,11 @@
 from typing import Tuple, Any
 from numpy import ndarray
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy import func
-from sqlalchemy import Column
 from sqlalchemy import Integer
-from sqlalchemy import ForeignKey
-from sqlalchemy import String
 from sqlalchemy import Date
-from sqlalchemy import DateTime
 import datetime
 from datetime import timedelta
 import os
-import sqlite3
 from sklearn.metrics import r2_score
 import numpy as np
 import pandas as pd
@@ -129,7 +121,8 @@ def przypis_inkaso_agencji(df, msc):
 
 
 def inkaso_magro(df, msc):
-    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) & (df['TUrozlcz?'] == 'rozl')]
+    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
+            (df['TUrozlcz?'] == 'rozl')]
 
     df = df.rename(columns={'TU Inkaso': 'Inkaso w PLN --> przychód'})
     df_msc = pd.Series(df['Miesiąc przypisu'].replace({'_': ''}, regex=True))
@@ -224,6 +217,7 @@ def displot_rocznik(df):
             ~(df['Nr rej miejscowość ulica nr'].str.contains('[a-z]', na=False)) &
             (df['Rok produkcji'].str.len() == 4)]
 
+    df = df.drop_duplicates(subset=['Nr rej miejscowość ulica nr'])
     df = df.sort_values(by='Rok produkcji')
 
     x = df['Rok produkcji']
@@ -275,7 +269,7 @@ def brak_inkaso(df):
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
             (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=20))) &
-            (df['TUrozlcz?'] == 'do rozl') &
+            # (df['TUrozlcz?'] == 'do rozl') &
             (df['TU Raty'] > 0)
             ]
 
@@ -326,6 +320,6 @@ if __name__ == '__main__':
     # inkaso_magro(sql_df, msc)
     # przypis_inkaso_magro(sql_df, msc)
     # displot_przypis(sql_df)
-    # displot_rocznik(sql_df)   <--- szkolka
+    displot_rocznik(sql_df)   #<--- szkolka
     # rocznik_przypis(sql_df)
-    brak_inkaso(sql_df)
+    # brak_inkaso(sql_df)
