@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 from matplotlib import dates
 import seaborn as sns
 from itertools import cycle
+import re
 
 
 pd.set_option('display.max_rows', None)
@@ -266,7 +267,7 @@ def rocznik_przypis(df):
 
 
 def brak_inkaso(df):
-    """Relacja pomiędzy rodzajem klienta a niezpłacona składka"""
+    """Wskaźnik niopłaconych składek."""
 
     df['Data rat'] = pd.to_datetime(df['Data rat'])
     df['Nazwisko'] = df['Nazwisko'].fillna(df['FIRMA'])
@@ -274,43 +275,25 @@ def brak_inkaso(df):
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
             (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=18))) &
-            # (df['TUrozlcz?'] == 'do rozl') &
+            (df['TUrozlcz?'] == 'do rozl') &
             (df['TU Raty'] > 0)
             ]
 
     all_dates = pd.date_range('2017', '2021.12.01').to_pydatetime()
 
-    print(df.head())
-    @plt.FuncFormatter
-    def fake_dates(x, pos):
-        """Custom formater to turn floats into e.g., 2016-05-08"""
-        return dates.num2date(x).strftime('%Y-%m-%d')
-
-
     df1 = df[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
     df2 = pd.DataFrame({'Data rat': all_dates})
-
-    """ - jeden, wiekszy ax,
-        - AUTOMATCZNE DATY,
-        - widoczne dane x na wykresie 
-    """
 
     df3 = pd.merge(df2, df1, how='left', on=['Data rat'])
     df3 = df3[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
 
     x = dates.datestr2num(df3['Data rat'].astype(str))
 
-
     new_arr = df3['TU Raty'].to_numpy()
-
-    # print(type(x), type(new_arr))
-    # print(df3)
-    print(x)
 
     df4 = pd.DataFrame({'Data rat': x,
                         'TU Raty': new_arr,
                         'Rozlicz skł. OWCA': df3['Rozlicz skł. OWCA']})
-
 
     ax = sns.lmplot(x='Data rat', y='TU Raty', data=df4, hue='Rozlicz skł. OWCA')
 
@@ -318,18 +301,12 @@ def brak_inkaso(df):
 
     uniqe_time2num = df4['Data rat'].unique()
 
-    date = [date.strftime('%Y-%m-%d') for date in dates.num2date(uniqe_time2num)[::182]]
-    ax.set(xticks=pd.to_numeric(uniqe_time2num)[::182], yticks=range(0, df4['TU Raty'].max().astype(int), 100))
+    # halves = re.match('\d{4}-06-30|\d{4}-12-31', date.strftime('%Y-%m-%d'))
+
+    date = [date.strftime('%Y-%m-%d') for date in dates.num2date(uniqe_time2num) if re.match('\d{4}-01-01', date.strftime('%Y-%m-%d'))]
+    ax.set(xticks=pd.to_numeric(uniqe_time2num)[::365], yticks=range(0, df4['TU Raty'].max().astype(int) + 100, 100))
 
     ax.set_xticklabels(date, rotation=45)
-
-    # here's the magic:
-    # ax.xaxis.set_major_formatter(fake_dates)
-
-    # legible labels
-    # ax.tick_params(labelrotation=45)
-
-    # plt.close(1)
     plt.show()
 
 
