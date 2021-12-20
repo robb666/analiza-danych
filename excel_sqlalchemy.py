@@ -274,12 +274,12 @@ def brak_inkaso(df):
 
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
-            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=18))) &
+            (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=20))) &
             (df['TUrozlcz?'] == 'do rozl') &
             (df['TU Raty'] > 0)
             ]
 
-    all_dates = pd.date_range('2017', '2021.12.01').to_pydatetime()
+    all_dates = pd.date_range('2017', '2022.01.01').to_pydatetime()
 
     df1 = df[['Data rat', 'TU Raty', 'Rozlicz skł. OWCA']]
     df2 = pd.DataFrame({'Data rat': all_dates})
