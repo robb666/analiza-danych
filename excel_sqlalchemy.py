@@ -204,7 +204,8 @@ def przypis_inkaso_magro(df, msc):
 
 
 def displot_przypis(df):
-    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) & (df['TUrozlcz?'] == 'rozl')]
+    df = df[(df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
+            (df['TUrozlcz?'] == 'rozl')]
     ax = sns.displot(df['Przypis'], height=12.5)
     plt.ticklabel_format(style='plain', axis='x')
     plt.show()
@@ -269,7 +270,7 @@ def brak_inkaso(df):
     df = df[
             (df['Rozlicz skł. OWCA'].isin(['MAGRO', 'Robert'])) &
             (df['Data rat'] <= (datetime.datetime.today() - timedelta(days=20))) &
-            # (df['TUrozlcz?'] == 'do rozl') &
+            (df['TUrozlcz?'] == 'do rozl') &
             (df['TU Raty'] > 0)
             ]
 
@@ -320,6 +321,6 @@ if __name__ == '__main__':
     # inkaso_magro(sql_df, msc)
     # przypis_inkaso_magro(sql_df, msc)
     # displot_przypis(sql_df)
-    displot_rocznik(sql_df)   #<--- szkolka
+    # displot_rocznik(sql_df)   #<--- szkolka
     # rocznik_przypis(sql_df)
-    # brak_inkaso(sql_df)
+    brak_inkaso(sql_df)
