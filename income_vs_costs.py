@@ -42,9 +42,18 @@ def make_sql(file):
 
 def read_bank(file):
     csv = pd.read_csv(file,
-                      names=['index', 'Data księgowania', 'Tytuł', 'Nadawca', 'Nr rachunku', 'Kwota', 'Saldo', 'idx', 'nanana'],
+                      names=[
+                             'Data księgowania',
+                             'Data zlecenia',
+                             'Tytuł',
+                             'Nadawca',
+                             'Nr rachunku',
+                             'Kwota',
+                             'Saldo',
+                             'idx',
+                             'nanana'
+                             ],
                       header=0)
-
     return csv
 
 
