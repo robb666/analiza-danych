@@ -62,16 +62,33 @@ def read_bank(file):
 
 def plot(db, df_bank):
     april_2020 = 10612  # data od czasu rozliczeń tylko na Spółkę
-    df_magro = db[db['index'] > april_2020].head()
+    september_2021 = 15053  # cofnicie sie do oplaconych skladek
+    # df_magro = db[db['index'] > april_2020]
+    df_magro = db[db['index'] < september_2021]
+    # df_magro = db
+    # df_bank = pd.DataFrame(bank)
+
+    print(df_magro.head())
 
 
-    print(df_bank)
-    ax = sns.scatterplot(x='Saldo', data=df_bank)
+    sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
+    # plt.gca().set(xlim=(0, 15249))
+    # ax = sns.regplot(df_magro.index, df_magro.Przypis,
+    #                  scatter=None,
+    #                  order=2,
+    #                  scatter_kws={'s': 10, 'alpha': 0.4},
+    #                  line_kws={'lw': 1, 'color': 'g'})
+
+
+    ax = sns.regplot(df_magro.index, df_magro['TU Inkaso'],
+                     scatter=None,
+                     order=2,
+                     scatter_kws={'s': 10, 'alpha': 0.4},
+                     line_kws={'lw': 1, 'color': 'black'})
 
     # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
-    # plt.show()
+    plt.show()
 
-    return df_bank
 
 
 if __name__ == '__main__':
