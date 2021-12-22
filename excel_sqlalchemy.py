@@ -302,6 +302,7 @@ def brak_inkaso(df):
     ax.set(xticks=pd.to_numeric(uniqe_time2num)[::365], yticks=range(0, df4['TU Raty'].max().astype(int) + 100, 100))
 
     ax.set_xticklabels(date, rotation=45)
+    plt.title('Niezapłacone składki.')
     plt.show()
 
 
