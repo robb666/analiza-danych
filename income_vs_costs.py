@@ -1,6 +1,8 @@
 import os
 from sqlalchemy import create_engine
 import pandas as pd
+from sqlalchemy import Date
+from sqlalchemy import Integer
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -57,21 +59,33 @@ def read_bank(file):
     return csv
 
 
+def plot(db, bank):
+    april_2020 = 10612  # data rozliczeń tylko na spółkę
+    df_magro = db[db['index'] > april_2020].head()
+
+    df_bank = bank.sort_index(axis=0, ascending=False, ignore_index=True)
+    df_bank = df_bank[['Data księgowania', 'Saldo']]
+    ax = sns.scatterplot(x='Saldo', data=df_bank)
+
+    # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
+    plt.show()
+
+    return df_bank
+
+
 if __name__ == '__main__':
 
     # file = "/run/user/1000/gvfs/smb-share:server=192.168.1.12,share=e/Agent baza/2014 BAZA MAGRO.xlsx"
-    file = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
-    bank_file = '/home/robb/Desktop/historia_2021-12-21_20109027050000000133736204.csv'
+    db_file = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
+    bank_statement = '/home/robb/Desktop/historia_2021-12-21_20109027050000000133736204.csv'
 
-    engine = make_sql(file)
+    engine = make_sql(db_file)
 
     sql_df = pd.read_sql('Select * from baza', engine)
 
-    bank = read_bank(bank_file)
+    bank = read_bank(bank_statement)
 
-    bank_data = pd.DataFrame(bank)
 
-    print(bank_data)
+    print(plot(sql_df, bank))
 
-    # print(sql_df)
 
