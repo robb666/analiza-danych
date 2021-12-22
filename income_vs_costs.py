@@ -55,20 +55,21 @@ def read_bank(file):
                              'idx',
                              'nanana'
                              ],
-                      header=0)
+                      usecols=['Data księgowania', 'Tytuł', 'Nadawca', 'Kwota', 'Saldo'],
+                      header=0).sort_index(axis=0, ascending=False, ignore_index=True)
     return csv
 
 
-def plot(db, bank):
-    april_2020 = 10612  # data rozliczeń tylko na spółkę
+def plot(db, df_bank):
+    april_2020 = 10612  # data od czasu rozliczeń tylko na Spółkę
     df_magro = db[db['index'] > april_2020].head()
 
-    df_bank = bank.sort_index(axis=0, ascending=False, ignore_index=True)
-    df_bank = df_bank[['Data księgowania', 'Saldo']]
+
+    print(df_bank)
     ax = sns.scatterplot(x='Saldo', data=df_bank)
 
     # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
-    plt.show()
+    # plt.show()
 
     return df_bank
 
