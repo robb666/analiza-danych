@@ -94,12 +94,13 @@ def plot(db, df_bank):
     #                  scatter_kws={'s': 10, 'alpha': 0.4},
     #                  line_kws={'lw': 1, 'color': 'black'})
 
-
-
+    print(df_bank)
     # x = np.arange(len(df_bank['Data księgowania']))
     # df_bank.insert(0, 'index', x)
     # df_bank.index = df_bank.index.astype(int)
-    df_bank.Saldo = df_bank.Saldo.apply(lambda x: str(x)[:-3]).astype(int)
+    df_bank.Kwota = df_bank.Kwota.replace({',': '.'}, regex=True) #.apply(lambda x: str(x)[:-3]).astype(int)
+    df_bank.Kwota = df_bank.Kwota.astype(float) * -1  #.apply(lambda x: str(x)[:-3]).astype(int)
+
 
 
     df_bank['Data nowa'] = df_bank['Data księgowania'].apply(lambda x: x[3:])
@@ -107,21 +108,26 @@ def plot(db, df_bank):
 
 
     # df_bankv = ax.xaxis.update_units(df_bank['Data księgowania'])
-    df_bank = df_bank[['Data nowa', 'Saldo']]
+    df_bank = df_bank[['Data nowa', 'Kwota']]
     df_bank = df_bank.groupby(['Data nowa']).sum().reset_index()
+
+    df_bank.Kwota = df_bank.Kwota.astype(int)
+
 
     df_srt = df_bank.sort_values(by=['Data nowa'])
     df_srt['Data nowa'] = pd.to_datetime(df_srt['Data nowa'])
-    df_bank2 = df_srt.sort_values('Data nowa').reset_index()
+    df_bank2 = df_srt.sort_values('Data nowa')
+    
+    x = df_bank2['Data nowa']
     print(df_bank2)
 
+    ax.xaxis.update_units(x)
 
+    print(df_bank2.dtypes)
 
-    # print(df_bank.dtypes)
-
-    ax = sns.regplot(x='Data nowa',
-    # ax = sns.regplot(x='Data księgowania',
-                     y='Saldo',
+    # ax = sns.regplot(x='Data nowa',
+    ax = sns.regplot(x=ax.xaxis.convert_units(x),
+                     y='Kwota',
                      data=df_bank2,
                      # scatter=None,
                      order=2,
