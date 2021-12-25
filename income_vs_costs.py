@@ -102,19 +102,22 @@ def plot(db, df_bank):
     df_bank.Saldo = df_bank.Saldo.apply(lambda x: str(x)[:-3]).astype(int)
 
 
-    df_bank['Data księgowania'] = df_bank['Data księgowania'].apply(lambda x: x[3:])
-    df_bank['Data księgowania'] = df_bank['Data księgowania']#.map(lambda x: pd.to_datetime(x))#.strftime('%d-%m-%Y'))
+    df_bank['Data nowa'] = df_bank['Data księgowania'].apply(lambda x: x[3:])
 
-    ax.xaxis.update_units(df_bank['Data księgowania'])
+    # df_bank['Data księgowania'] = df_bank['Data księgowania']#.map(lambda x: pd.to_datetime(x))#.strftime('%d-%m-%Y'))
 
-    df_bank = df_bank.groupby('Data księgowania')
-    print(df_bank.head(15))
+    # df_bankv = ax.xaxis.update_units(df_bank['Data księgowania'])
+    new_df = df_bank[['Data nowa', 'Saldo']]
+    df_bankv = new_df.groupby(['Data nowa']).sum()
+    df_bankv = df_bankv.sort_values(by=['Data nowa']).reset_index()
+    print(df_bankv)
 
     # print(df_bank.dtypes)
 
-    ax = sns.regplot(x=ax.xaxis.convert_units(x),
+    ax = sns.regplot(x='Data nowa',
+    # ax = sns.regplot(x='Data księgowania',
                      y='Saldo',
-                     data=df_bank,
+                     data=df_bankv,
                      # scatter=None,
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
