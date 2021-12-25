@@ -88,34 +88,32 @@ def plot(db, df_bank):
     #                  line_kws={'lw': 1, 'color': 'g'})
 
 
-    print(df_magro.head())
-
-    # df_magro['TU Inkaso'] = df_magro['TU Inkaso'].astype(float)
+    # print(df_magro.head())
 
     df_magro2 = df_magro[['Data wystawienia', 'TU Inkaso']]
 
-    print(df_magro2['Data wystawienia'])
+    # print(df_magro2['Data wystawienia'])
     df_magro2['Data nowa'] = df_magro2['Data wystawienia'].fillna('2021-04-27')
-    df_magro2 = df_magro2['Data nowa'].apply(lambda x: x[:-3])
-    print(df_magro2)
+    df_magro2['Data nowa'] = df_magro2['Data nowa'].apply(lambda x: x[:-3])
 
     df_magro2['Data nowa'] = pd.to_datetime(df_magro2['Data nowa'])
     df_magro2 = df_magro2.groupby(['Data nowa']).sum().reset_index()
-
+    df_magro2 = df_magro2[3:-1]
+    df_magro2['TU Inkaso'] = df_magro2['TU Inkaso'].astype(int)
+    x = df_magro2['Data nowa']
     print(df_magro2)
-    print(df_magro2.dtypes)
+    ax.xaxis.update_units(x)
 
-
-    ax = sns.regplot(x=df_magro.index,
-                     y=df_magro['TU Inkaso'],
+    ax = sns.regplot(x=ax.xaxis.convert_units(x),
+                     y='TU Inkaso',
                      # scatter=None,
+                     data=df_magro2,
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
                      line_kws={'lw': 1, 'color': 'black'})
 
 
     # print(df_bank)
-
     df_bank.Kwota = df_bank.Kwota.replace({',': '.'}, regex=True)
     df_bank.Kwota = df_bank.Kwota.astype(float) * -1
 
@@ -135,15 +133,15 @@ def plot(db, df_bank):
 
     ax.xaxis.update_units(x)
 
-    # print(df_bank2.dtypes)
-    # # ax = sns.regplot(x='Data nowa',
-    # ax = sns.regplot(x=ax.xaxis.convert_units(x),
-    #                  y='Kwota',
-    #                  data=df_bank2,
-    #                  # scatter=None,
-    #                  order=2,
-    #                  scatter_kws={'s': 10, 'alpha': 0.4},
-    #                  line_kws={'lw': 1, 'color': 'g'})
+    print(df_bank2.dtypes)
+    # ax = sns.regplot(x='Data nowa',
+    ax = sns.regplot(x=ax.xaxis.convert_units(x),
+                     y='Kwota',
+                     data=df_bank2,
+                     # scatter=None,
+                     order=2,
+                     scatter_kws={'s': 10, 'alpha': 0.4},
+                     line_kws={'lw': 1, 'color': 'g'})
 
     # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
     plt.show()
