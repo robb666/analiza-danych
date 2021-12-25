@@ -69,30 +69,20 @@ def plot(db, df_bank):
                   (db['index'] > april_2020) &
                   (db['index'] < november_2021)
     ]
-
-    # df_magro = db
-    # df_bank = pd.DataFrame(bank)
-
-    # print(df_magro.index)
-    # print(df_bank.index.astype('Int64'))
-
-
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
     # plt.gca().set(xlim=(0, 15249))
     # print(df_magro.index)
 
-    # ax = sns.regplot(x=df_magro.index, y=df_magro.Przypis,
+    # ax = sns.regplot(x=df_magro.index,
+#                      y=df_magro.Przypis,
     #                  scatter=None,
     #                  order=2,
     #                  scatter_kws={'s': 10, 'alpha': 0.4},
     #                  line_kws={'lw': 1, 'color': 'g'})
 
-
     # print(df_magro.head())
 
     df_magro2 = df_magro[['Data wystawienia', 'TU Inkaso']]
-
-    # print(df_magro2['Data wystawienia'])
     df_magro2['Data nowa'] = df_magro2['Data wystawienia'].fillna('2021-04-27')
     df_magro2['Data nowa'] = df_magro2['Data nowa'].apply(lambda x: x[:-3])
 
@@ -113,7 +103,6 @@ def plot(db, df_bank):
                      line_kws={'lw': 1, 'color': 'g'})
 
 
-    # print(df_bank)
     df_bank.Kwota = df_bank.Kwota.replace({',': '.'}, regex=True)
     df_bank.Kwota = df_bank.Kwota.astype(float) # * -1
 
@@ -127,14 +116,11 @@ def plot(db, df_bank):
     df_srt = df_bank.sort_values(by=['Data nowa'])
     df_srt['Data nowa'] = pd.to_datetime(df_srt['Data nowa'])
     df_bank2 = df_srt.sort_values('Data nowa')
-
     x = df_bank2['Data nowa']
-    # print(df_bank2)
-
     ax.xaxis.update_units(x)
 
     print(df_bank2)
-    # ax = sns.regplot(x='Data nowa',
+
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='Kwota',
                      data=df_bank2,
