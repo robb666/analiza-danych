@@ -1,5 +1,4 @@
 import os
-
 import numpy as np
 from sqlalchemy import create_engine
 import pandas as pd
@@ -7,6 +6,7 @@ from sqlalchemy import Date
 from sqlalchemy import Integer
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datetime import datetime
 
 
 pd.set_option('display.max_rows', None)
@@ -79,7 +79,7 @@ def plot(db, df_bank):
 
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
     # plt.gca().set(xlim=(0, 15249))
-    print(df_magro.index)
+    # print(df_magro.index)
 
     # ax = sns.regplot(x=df_magro.index, y=df_magro.Przypis,
     #                  scatter=None,
@@ -96,16 +96,23 @@ def plot(db, df_bank):
 
 
 
-    x = np.arange(679)
+    x = np.arange(len(df_bank['Data księgowania']))
     df_bank.insert(0, 'index', x)
     df_bank.index = df_bank.index.astype(int)
     df_bank.Saldo = df_bank.Saldo.apply(lambda x: str(x)[:-3]).astype(int)
-    print(df_bank)
 
 
-    print(df_bank.dtypes)
+    df_bank['Data księgowania'] = df_bank['Data księgowania'].apply(lambda x: x[3:])
+    df_bank['Data księgowania'] = df_bank['Data księgowania']#.map(lambda x: pd.to_datetime(x))#.strftime('%d-%m-%Y'))
 
-    ax = sns.regplot(x='index',
+    ax.xaxis.update_units(df_bank['Data księgowania'])
+
+    df_bank = df_bank.groupby('Data księgowania')
+    print(df_bank.head(15))
+
+    # print(df_bank.dtypes)
+
+    ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='Saldo',
                      data=df_bank,
                      # scatter=None,
