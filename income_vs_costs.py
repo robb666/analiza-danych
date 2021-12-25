@@ -110,12 +110,12 @@ def plot(db, df_bank):
                      data=df_magro2,
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
-                     line_kws={'lw': 1, 'color': 'black'})
+                     line_kws={'lw': 1, 'color': 'g'})
 
 
     # print(df_bank)
     df_bank.Kwota = df_bank.Kwota.replace({',': '.'}, regex=True)
-    df_bank.Kwota = df_bank.Kwota.astype(float) * -1
+    df_bank.Kwota = df_bank.Kwota.astype(float) # * -1
 
     df_bank['Data nowa'] = df_bank['Data księgowania'].apply(lambda x: x[3:])
 
@@ -133,7 +133,7 @@ def plot(db, df_bank):
 
     ax.xaxis.update_units(x)
 
-    print(df_bank2.dtypes)
+    print(df_bank2)
     # ax = sns.regplot(x='Data nowa',
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='Kwota',
@@ -141,7 +141,7 @@ def plot(db, df_bank):
                      # scatter=None,
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
-                     line_kws={'lw': 1, 'color': 'g'})
+                     line_kws={'lw': 1, 'color': 'r'})
 
     # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
     plt.show()
