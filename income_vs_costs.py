@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 from sqlalchemy import create_engine
 import pandas as pd
 from sqlalchemy import Date
@@ -62,29 +64,54 @@ def read_bank(file):
 
 def plot(db, df_bank):
     april_2020 = 10612  # data od czasu rozliczeń tylko na Spółkę
-    september_2021 = 15053  # cofnicie sie do oplaconych skladek
-    # df_magro = db[db['index'] > april_2020]
-    df_magro = db[db['index'] < september_2021]
+    november_2021 = 15053  # cofnicie sie do oplaconych skladek
+    df_magro = db[
+                  (db['index'] > april_2020) &
+                  (db['index'] < november_2021)
+    ]
+
     # df_magro = db
     # df_bank = pd.DataFrame(bank)
 
-    print(df_magro.head())
+    # print(df_magro.index)
+    # print(df_bank.index.astype('Int64'))
 
 
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
     # plt.gca().set(xlim=(0, 15249))
-    # ax = sns.regplot(df_magro.index, df_magro.Przypis,
+    print(df_magro.index)
+
+    # ax = sns.regplot(x=df_magro.index, y=df_magro.Przypis,
     #                  scatter=None,
     #                  order=2,
     #                  scatter_kws={'s': 10, 'alpha': 0.4},
     #                  line_kws={'lw': 1, 'color': 'g'})
 
 
-    ax = sns.regplot(df_magro.index, df_magro['TU Inkaso'],
-                     scatter=None,
+    # ax = sns.regplot(df_magro.index, df_magro['TU Inkaso'],
+    #                  scatter=None,
+    #                  order=2,
+    #                  scatter_kws={'s': 10, 'alpha': 0.4},
+    #                  line_kws={'lw': 1, 'color': 'black'})
+
+
+
+    x = np.arange(679)
+    df_bank.insert(0, 'index', x)
+    df_bank.index = df_bank.index.astype(int)
+    df_bank.Saldo = df_bank.Saldo.apply(lambda x: str(x)[:-3]).astype(int)
+    print(df_bank)
+
+
+    print(df_bank.dtypes)
+
+    ax = sns.regplot(x='index',
+                     y='Saldo',
+                     data=df_bank,
+                     # scatter=None,
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
-                     line_kws={'lw': 1, 'color': 'black'})
+                     line_kws={'lw': 1, 'color': 'g'})
 
     # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
     plt.show()
@@ -95,7 +122,7 @@ if __name__ == '__main__':
 
     # file = "/run/user/1000/gvfs/smb-share:server=192.168.1.12,share=e/Agent baza/2014 BAZA MAGRO.xlsx"
     db_file = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
-    bank_statement = '/home/robb/Desktop/historia_2021-12-21_20109027050000000133736204.csv'
+    bank_statement = '/home/robb/Desktop/historia_2021-12-25_20109027050000000133736204.csv'
 
     engine = make_sql(db_file)
 
