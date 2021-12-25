@@ -94,11 +94,13 @@ def plot(db, df_bank):
 
     df_magro2 = df_magro[['Data wystawienia', 'TU Inkaso']]
 
-    df_magro2['Data nowa'] = df_magro2['Data wystawienia']
-    # df_magro2['Data nowa'] = df_magro2['Data wystawienia'].apply(lambda x: x[:-3])
+    print(df_magro2['Data wystawienia'])
+    df_magro2['Data nowa'] = df_magro2['Data wystawienia'].fillna('2021-04-27')
+    df_magro2 = df_magro2['Data nowa'].apply(lambda x: x[:-3])
+    print(df_magro2)
 
     df_magro2['Data nowa'] = pd.to_datetime(df_magro2['Data nowa'])
-    df_magro2 =df_magro2.groupby(['Data nowa']).sum().reset_index()
+    df_magro2 = df_magro2.groupby(['Data nowa']).sum().reset_index()
 
     print(df_magro2)
     print(df_magro2.dtypes)
