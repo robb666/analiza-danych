@@ -92,9 +92,16 @@ def plot(db, df_bank):
 
     # df_magro['TU Inkaso'] = df_magro['TU Inkaso'].astype(float)
 
-    df_magro = df_magro[['Data wystawienia', 'TU Inkaso']]
+    df_magro2 = df_magro[['Data wystawienia', 'TU Inkaso']]
 
-    df_magro['Data wystawienia'] = df_magro['Data wystawienia'] .apply(lambda x: x[:-3])
+    df_magro2['Data nowa'] = df_magro2['Data wystawienia']
+    # df_magro2['Data nowa'] = df_magro2['Data wystawienia'].apply(lambda x: x[:-3])
+
+    df_magro2['Data nowa'] = pd.to_datetime(df_magro2['Data nowa'])
+    df_magro2 =df_magro2.groupby(['Data nowa']).sum().reset_index()
+
+    print(df_magro2)
+    print(df_magro2.dtypes)
 
 
     ax = sns.regplot(x=df_magro.index,
