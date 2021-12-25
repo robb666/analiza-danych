@@ -96,9 +96,9 @@ def plot(db, df_bank):
 
 
 
-    x = np.arange(len(df_bank['Data księgowania']))
-    df_bank.insert(0, 'index', x)
-    df_bank.index = df_bank.index.astype(int)
+    # x = np.arange(len(df_bank['Data księgowania']))
+    # df_bank.insert(0, 'index', x)
+    # df_bank.index = df_bank.index.astype(int)
     df_bank.Saldo = df_bank.Saldo.apply(lambda x: str(x)[:-3]).astype(int)
 
 
