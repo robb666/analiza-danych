@@ -64,9 +64,11 @@ def read_bank(file):
 
 def plot(db, df_bank):
     april_2020 = 10612  # data od czasu rozliczeń tylko na Spółkę
+    december_2020 = 12555  # rok 2021
     november_2021 = 15053  # cofnicie sie do oplaconych skladek
     df_magro = db[
-                  (db['index'] > april_2020) &
+                  (db['index'] > december_2020) &
+                  ~(db['Miesiąc przypisu'] == '20_12') &
                   (db['index'] < november_2021)
     ]
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
@@ -74,7 +76,7 @@ def plot(db, df_bank):
     # print(df_magro.index)
 
     # ax = sns.regplot(x=df_magro.index,
-#                      y=df_magro.Przypis,
+    #                  y=df_magro.Przypis,
     #                  scatter=None,
     #                  order=2,
     #                  scatter_kws={'s': 10, 'alpha': 0.4},
@@ -84,6 +86,7 @@ def plot(db, df_bank):
 
     df_magro2 = df_magro[['Data wystawienia', 'TU Inkaso']]
     df_magro2['Data nowa'] = df_magro2['Data wystawienia'].fillna('2021-04-27')
+    # df_magro2.loc[666:, ('Data nowa')] = '2021-04-27'
     df_magro2['Data nowa'] = df_magro2['Data nowa'].apply(lambda x: x[:-3])
 
     df_magro2['Data nowa'] = pd.to_datetime(df_magro2['Data nowa'])
@@ -91,7 +94,8 @@ def plot(db, df_bank):
     df_magro2 = df_magro2[3:-1]
     df_magro2['TU Inkaso'] = df_magro2['TU Inkaso'].astype(int)
     x = df_magro2['Data nowa']
-    print(df_magro2)
+    # print(df_magro2)
+    print(f"Suma Inkasa: {df_magro2['TU Inkaso'].sum()} zł")
     ax.xaxis.update_units(x)
 
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
@@ -104,22 +108,39 @@ def plot(db, df_bank):
 
 
     df_bank.Kwota = df_bank.Kwota.replace({',': '.'}, regex=True)
-    df_bank.Kwota = df_bank.Kwota.astype(float) # * -1
+    df_bank.Kwota = df_bank.Kwota.astype(float)
 
     df_bank['Data nowa'] = df_bank['Data księgowania'].apply(lambda x: x[3:])
 
-    df_bank = df_bank[['Data nowa', 'Kwota']]
+    df_bank = df_bank[['Data nowa', 'Nadawca', 'Kwota']]
+    df_bank['Nadawca'] = df_bank['Nadawca'].fillna('bez tyt.')
+    mg = df_bank[df_bank['Nadawca'].str.contains('MAGRO MACIEJ')]
+
+
+    df_bank = df_bank[df_bank['Kwota'] * -1 > 0]
+
+
+    print(mg.head())
+
+    df_bank.insert(2, 'mg', mg['Kwota'])
+    print(df_bank.head(30))
+
     df_bank = df_bank.groupby(['Data nowa']).sum().reset_index()
+
+
 
     df_bank.Kwota = df_bank.Kwota.astype(int)
 
     df_srt = df_bank.sort_values(by=['Data nowa'])
     df_srt['Data nowa'] = pd.to_datetime(df_srt['Data nowa'])
     df_bank2 = df_srt.sort_values('Data nowa')
+    df_bank2 = df_bank2[df_bank2['Data nowa'] > pd.to_datetime('2020-12')]
+    print(df_bank2)
     x = df_bank2['Data nowa']
     ax.xaxis.update_units(x)
 
-    print(df_bank2)
+    # print(df_bank2)
+    # print(df_bank[df_bank.Kwota < 0])
 
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='Kwota',
@@ -130,7 +151,7 @@ def plot(db, df_bank):
                      line_kws={'lw': 1, 'color': 'r'})
 
     # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
-    plt.show()
+    # plt.show()
 
 
 
@@ -138,7 +159,7 @@ if __name__ == '__main__':
 
     # file = "/run/user/1000/gvfs/smb-share:server=192.168.1.12,share=e/Agent baza/2014 BAZA MAGRO.xlsx"
     db_file = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
-    bank_statement = '/home/robb/Desktop/historia_2021-12-25_20109027050000000133736204.csv'
+    bank_statement = '/home/robb/Desktop/historia_2021-12-26_20109027050000000133736204.csv'
 
     engine = make_sql(db_file)
 
