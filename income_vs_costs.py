@@ -121,9 +121,8 @@ def plot(db, df_bank):
 
 
     print(mg.head())
-
-    df_bank.insert(2, 'mg', mg['Kwota'])
-    print(df_bank.head(30))
+    # df_bank.loc[mg] = mg
+    print(df_bank.head(35))
 
     df_bank = df_bank.groupby(['Data nowa']).sum().reset_index()
 
