@@ -66,7 +66,7 @@ def plot(db, df_bank):
     april_2020 = 10612  # data od czasu rozliczeń tylko na Spółkę
     december_2020 = 12555  # rok 2021
     november_2021 = 15053  # cofnicie sie do oplaconych skladek
-    df_magro = db[
+    df_income = db[
                   (db['index'] > december_2020) &
                   ~(db['Miesiąc przypisu'] == '20_12') &
                   (db['index'] < november_2021)
@@ -84,24 +84,28 @@ def plot(db, df_bank):
 
     # print(df_magro.head())
 
-    df_magro2 = df_magro[['Data wystawienia', 'TU Inkaso']]
-    df_magro2['Data nowa'] = df_magro2['Data wystawienia'].fillna('2021-04-27')
+    df_income2 = df_income[['Data wystawienia', 'TU Inkaso']]
+    df_income2['Data nowa'] = df_income2['Data wystawienia'].fillna('2021-04-27')
     # df_magro2.loc[666:, ('Data nowa')] = '2021-04-27'
-    df_magro2['Data nowa'] = df_magro2['Data nowa'].apply(lambda x: x[:-3])
+    df_income2['Data nowa'] = df_income2['Data nowa'].apply(lambda x: x[:-3])
 
-    df_magro2['Data nowa'] = pd.to_datetime(df_magro2['Data nowa'])
-    df_magro2 = df_magro2.groupby(['Data nowa']).sum().reset_index()
-    df_magro2 = df_magro2[3:-1]
-    df_magro2['TU Inkaso'] = df_magro2['TU Inkaso'].astype(int)
-    x = df_magro2['Data nowa']
+    df_income2['Data nowa'] = pd.to_datetime(df_income2['Data nowa'])
+    df_income2 = df_income2.groupby(['Data nowa']).sum().reset_index()
+
+    df_income2 = df_income2[(df_income2['Data nowa'] > pd.to_datetime('2020-12')) &
+                          (df_income2['Data nowa'] < pd.to_datetime('2021-11'))]
+
+    df_income2['TU Inkaso'] = df_income2['TU Inkaso'].astype(int)
+    print(df_income2)
+    x = df_income2['Data nowa']
     # print(df_magro2)
-    print(f"Suma Inkasa: {df_magro2['TU Inkaso'].sum()} zł")
+    print(f"\nSuma Inkasa: {df_income2['TU Inkaso'].sum()} zł")
     ax.xaxis.update_units(x)
 
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='TU Inkaso',
                      # scatter=None,
-                     data=df_magro2,
+                     data=df_income2,
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
                      line_kws={'lw': 1, 'color': 'g'})
@@ -112,31 +116,30 @@ def plot(db, df_bank):
 
     df_bank['Data nowa'] = df_bank['Data księgowania'].apply(lambda x: x[3:])
 
-    df_bank = df_bank[['Data nowa', 'Nadawca', 'Kwota']]
-    df_bank['Nadawca'] = df_bank['Nadawca'].fillna('bez tyt.')
-    mg = df_bank[df_bank['Nadawca'].str.contains('MAGRO MACIEJ')]
+    df_costs = df_bank[['Data nowa', 'Nadawca', 'Kwota']]
+    df_costs['Nadawca'] = df_costs['Nadawca'].fillna('bez tyt.')
+    mg = df_costs[df_costs['Nadawca'].str.contains('MAGRO MACIEJ')]
     mg.Kwota = mg.Kwota * -1
 
-    df_bank = df_bank[df_bank['Kwota'] < 0]
-    df_bank.Kwota = df_bank.Kwota * -1
+    df_costs = df_costs[df_costs['Kwota'] < 0]
+    df_costs.Kwota = df_costs.Kwota * -1
 
-    df_bank = pd.concat([df_bank, mg], axis=1, ignore_index=False)
-    df_bank = df_bank.groupby(df_bank.columns, axis=1).sum()
+    df_costs = pd.concat([df_costs, mg], axis=1, ignore_index=False)
+    df_costs = df_costs.groupby(df_costs.columns, axis=1).sum()
 
-    df_bank = df_bank.groupby(['Data nowa']).sum().reset_index()
+    df_costs = df_costs.groupby(['Data nowa']).sum().reset_index()
+    df_costs.Kwota = df_costs.Kwota.astype(int)
 
-    df_bank.Kwota = df_bank.Kwota.astype(int)
-
-    df_bank['Data nowa'] = pd.to_datetime(df_bank['Data nowa'])
-    df_bank = df_bank.sort_values('Data nowa')
-    df_bank = df_bank[df_bank['Data nowa'] > pd.to_datetime('2020-12')]
-    print(df_bank)
-    x = df_bank['Data nowa']
+    df_costs['Data nowa'] = pd.to_datetime(df_costs['Data nowa'])
+    df_costs = df_costs.sort_values('Data nowa')
+    df_costs = df_costs[df_costs['Data nowa'] > pd.to_datetime('2020-12')]
+    print(df_costs)
+    x = df_costs['Data nowa']
     ax.xaxis.update_units(x)
 
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='Kwota',
-                     data=df_bank,
+                     data=df_costs,
                      # scatter=None,
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
@@ -144,7 +147,6 @@ def plot(db, df_bank):
 
     # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
     plt.show()
-
 
 
 if __name__ == '__main__':
@@ -159,7 +161,4 @@ if __name__ == '__main__':
 
     bank = read_bank(bank_statement)
 
-
     print(plot(sql_df, bank))
-
-
