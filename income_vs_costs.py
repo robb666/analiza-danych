@@ -115,42 +115,35 @@ def plot(db, df_bank):
     df_bank = df_bank[['Data nowa', 'Nadawca', 'Kwota']]
     df_bank['Nadawca'] = df_bank['Nadawca'].fillna('bez tyt.')
     mg = df_bank[df_bank['Nadawca'].str.contains('MAGRO MACIEJ')]
+    mg.Kwota = mg.Kwota * -1
 
+    df_bank = df_bank[df_bank['Kwota'] < 0]
+    df_bank.Kwota = df_bank.Kwota * -1
 
-    df_bank = df_bank[df_bank['Kwota'] * -1 > 0]
-
-
-    print(mg.head())
-    # df_bank.loc[mg] = mg
-    print(df_bank.head(35))
+    df_bank = pd.concat([df_bank, mg], axis=1, ignore_index=False)
+    df_bank = df_bank.groupby(df_bank.columns, axis=1).sum()
 
     df_bank = df_bank.groupby(['Data nowa']).sum().reset_index()
 
-
-
     df_bank.Kwota = df_bank.Kwota.astype(int)
 
-    df_srt = df_bank.sort_values(by=['Data nowa'])
-    df_srt['Data nowa'] = pd.to_datetime(df_srt['Data nowa'])
-    df_bank2 = df_srt.sort_values('Data nowa')
-    df_bank2 = df_bank2[df_bank2['Data nowa'] > pd.to_datetime('2020-12')]
-    print(df_bank2)
-    x = df_bank2['Data nowa']
+    df_bank['Data nowa'] = pd.to_datetime(df_bank['Data nowa'])
+    df_bank = df_bank.sort_values('Data nowa')
+    df_bank = df_bank[df_bank['Data nowa'] > pd.to_datetime('2020-12')]
+    print(df_bank)
+    x = df_bank['Data nowa']
     ax.xaxis.update_units(x)
-
-    # print(df_bank2)
-    # print(df_bank[df_bank.Kwota < 0])
 
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='Kwota',
-                     data=df_bank2,
+                     data=df_bank,
                      # scatter=None,
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
                      line_kws={'lw': 1, 'color': 'r'})
 
     # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
-    # plt.show()
+    plt.show()
 
 
 
