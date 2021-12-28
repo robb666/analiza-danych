@@ -69,9 +69,9 @@ def plot(db, df_bank):
     december_2020 = 12555  # rok 2021
     november_2021 = 15053  # cofnicie sie do oplaconych skladek
     df_income = db[
-                  (db['index'] > december_2020) &
-                  ~(db['Miesiąc przypisu'] == '20_12') &
-                  (db['index'] < november_2021)
+                  (db['Rok rozlicz nr PERITUS'].str.contains('21'))
+                  # (pd.to_datetime(db['Data inkasa']) > pd.to_datetime('2020-01'))
+                  # (db['index'] < november_2021)
     ]
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
     # plt.gca().set(xlim=(0, 15249))
@@ -85,6 +85,9 @@ def plot(db, df_bank):
     #                  line_kws={'lw': 1, 'color': 'g'})
 
     # print(df_magro.head())
+
+    """Wybrać z rozliczonych, Rok rozlicz nr PERITUS"""
+
 
     df_income2 = df_income[['Data wystawienia', 'TU Inkaso']]
     df_income2['Data nowa'] = df_income2['Data wystawienia'].fillna('2021-04-27')
@@ -101,7 +104,7 @@ def plot(db, df_bank):
     # print(df_income2)
     x = df_income2['Data nowa']
     # print(df_magro2)
-    print(f"\nSuma Inkasa: {df_income2['TU Inkaso'].sum()} zł\n")
+    print(f"\nSuma Inkasa z Bazy: {df_income2['TU Inkaso'].sum()} zł\n")
     ax.xaxis.update_units(x)
 
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
@@ -124,13 +127,15 @@ def plot(db, df_bank):
     df_costs = df_bank[['Data nowa', 'Nadawca', 'Kwota']]
     df_costs['Nadawca'] = df_costs['Nadawca'].fillna('bez tyt.')
 
+    # print(df_costs)
+
     customers_premium = df_costs.iloc[[
-                                      140, 160, 295, 327, 353,  # 2020
+                                      # 140, 160, 295, 327, 353,  # 2020
                                       596, 599, 610, 620, 622,  # 2021
-                                      651, 777, 789, 824, 836,  # 2021
+                                      651, 709, 777, 789, 824, 836,  # 2021
                                       867, 895, 905, 960, 966,  # 2021
                                       985]]  # 2021
-
+    # print(customers_premium)
     customers_premium.Kwota = customers_premium.Kwota * -1
 
     mg = df_costs[df_costs['Nadawca'].str.contains('MAGRO MACIEJ')]
@@ -152,7 +157,7 @@ def plot(db, df_bank):
     df_costs['Data nowa'] = pd.to_datetime(df_costs['Data nowa'])
     df_costs = df_costs.sort_values('Data nowa')
     df_costs = df_costs[df_costs['Data nowa'] > pd.to_datetime('2020-12')]
-    print(f'Suma Kosztów: {df_costs.Kwota.sum()} zł')
+    print(f'Suma Kosztów z konta: {df_costs.Kwota.sum()} zł')
 
     print(f'\nInkaso minus Koszty: {df_income2["TU Inkaso"].sum() - df_costs.Kwota.sum()} zł')
 
