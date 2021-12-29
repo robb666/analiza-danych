@@ -68,11 +68,13 @@ def plot(db, df_bank):
     april_2020 = 10612  # wiersz od czasu rozliczeń tylko na Spółkę
     december_2020 = 12555  # rok 2021
     november_2021 = 15053  # cofnicie sie do oplaconych skladek
+
     df_income = db[
-                  (db['Rok rozlicz nr PERITUS'].str.contains('21'))
-                  # (pd.to_datetime(db['Data inkasa']) > pd.to_datetime('2020-01'))
-                  # (db['index'] < november_2021)
+                      (db['Rok rozlicz nr PERITUS'].str.contains('_21', na=False))
     ]
+
+    print(df_income['TU Inkaso'].sum())
+
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
     # plt.gca().set(xlim=(0, 15249))
     # print(df_magro.index)
@@ -86,9 +88,6 @@ def plot(db, df_bank):
 
     # print(df_magro.head())
 
-    """Wybrać z rozliczonych, Rok rozlicz nr PERITUS"""
-
-
     df_income2 = df_income[['Data wystawienia', 'TU Inkaso']]
     df_income2['Data nowa'] = df_income2['Data wystawienia'].fillna('2021-04-27')
     # df_magro2.loc[666:, ('Data nowa')] = '2021-04-27'
@@ -97,8 +96,8 @@ def plot(db, df_bank):
     df_income2['Data nowa'] = pd.to_datetime(df_income2['Data nowa'])
     df_income2 = df_income2.groupby(['Data nowa']).sum().reset_index()
 
-    df_income2 = df_income2[(df_income2['Data nowa'] > pd.to_datetime('2020-12')) &
-                          (df_income2['Data nowa'] < pd.to_datetime('2021-11'))]
+    df_income2 = df_income2[(df_income2['Data nowa'] > pd.to_datetime('2020-12'))] # &
+                          # (df_income2['Data nowa'] < pd.to_datetime('2021-11'))]
 
     df_income2['TU Inkaso'] = df_income2['TU Inkaso'].astype(int)
     # print(df_income2)
@@ -132,9 +131,9 @@ def plot(db, df_bank):
     customers_premium = df_costs.iloc[[
                                       # 140, 160, 295, 327, 353,  # 2020
                                       596, 599, 610, 620, 622,  # 2021
-                                      651, 709, 777, 789, 824, 836,  # 2021
-                                      867, 895, 905, 960, 966,  # 2021
-                                      985]]  # 2021
+                                      651, 709, 777, 789, 824,   # 2021
+                                      836, 867, 895, 905, 960,   # 2021
+                                      966, 985]]  # 2021
     # print(customers_premium)
     customers_premium.Kwota = customers_premium.Kwota * -1
 
