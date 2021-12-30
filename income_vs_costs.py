@@ -142,7 +142,7 @@ def plot(db, df_bank):
     df_costs = df_costs.sort_values('Data nowa')
     df_costs = df_costs[(pd.to_datetime('2020-12') < df_costs['Data nowa']) &
                         (df_costs['Data nowa'] < pd.to_datetime('2021-12'))]
-    
+
     print(f'Suma Kosztów z konta: {df_costs.Kwota.sum()} zł')
 
     print(f'\nInkaso minus Koszty: {df_income["TU Inkaso"].sum() - df_costs.Kwota.sum()} zł')
