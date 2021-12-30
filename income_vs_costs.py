@@ -88,32 +88,40 @@ def plot(db, df_bank):
 
     # print(df_magro.head())
 
-    df_income2 = df_income[['Data wystawienia', 'TU Inkaso']]
-    df_income2['Data nowa'] = df_income2['Data wystawienia'].fillna('2021-04-27')
+    # df_income2 = df_income[['Data wystawienia', 'TU Inkaso']]
+    # df_income2['Data nowa'] = df_income2['Data wystawienia'].fillna('2021-04-27')
     # df_magro2.loc[666:, ('Data nowa')] = '2021-04-27'
-    df_income2['Data nowa'] = df_income2['Data nowa'].apply(lambda x: x[:-3])
+    # df_income2['Data nowa'] = df_income2['Data nowa'].apply(lambda x: x[:-3])
 
-    df_income2['Data nowa'] = pd.to_datetime(df_income2['Data nowa'])
-    df_income2 = df_income2.groupby(['Data nowa']).sum().reset_index()
+    df_income['TU nr rozlicz prowizji'] = df_income['TU nr rozlicz prowizji'].str.extract('\w+(\d{4})')
+    df_income.dropna(subset=['TU nr rozlicz prowizji'], inplace=True)
+    df_income['TU nr rozlicz prowizji'] = pd.to_datetime(df_income['TU nr rozlicz prowizji']).dt.strftime('%y%m')
 
-    df_income2 = df_income2[(df_income2['Data nowa'] > pd.to_datetime('2020-12'))] # &
-                          # (df_income2['Data nowa'] < pd.to_datetime('2021-11'))]
+    print(df_income['TU nr rozlicz prowizji'])
 
-    df_income2['TU Inkaso'] = df_income2['TU Inkaso'].astype(int)
+
+
+    # df_income2['Data nowa'] = pd.to_datetime(df_income2['Data nowa'])
+    # df_income2 = df_income2.groupby(['Data nowa']).sum().reset_index()
+
+    # df_income2 = df_income2[(df_income2['Data nowa'] > pd.to_datetime('2020-12')) &
+    #                       (df_income2['Data nowa'] < pd.to_datetime('2022-01'))]
+
+    df_income['TU Inkaso'] = df_income['TU Inkaso'].fillna(0).astype(int)
     # print(df_income2)
-    x = df_income2['Data nowa']
+    x = df_income['Data wystawienia']
     # print(df_magro2)
-    print(f"\nSuma Inkasa z Bazy: {df_income2['TU Inkaso'].sum()} zł\n")
+    print(f"\nSuma Inkasa z Bazy: {df_income['TU Inkaso'].sum()} zł\n")
     ax.xaxis.update_units(x)
 
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='TU Inkaso',
                      # scatter=None,
-                     data=df_income2,
+                     data=df_income,
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
                      line_kws={'lw': 1, 'color': 'g'})
-
+    plt.show()
 
     df_bank.Kwota = df_bank.Kwota.replace({',': '.'}, regex=True)
     df_bank.Kwota = df_bank.Kwota.astype(float)
@@ -126,15 +134,16 @@ def plot(db, df_bank):
     df_costs = df_bank[['Data nowa', 'Nadawca', 'Kwota']]
     df_costs['Nadawca'] = df_costs['Nadawca'].fillna('bez tyt.')
 
-    # print(df_costs)
+    print(df_costs)
 
     customers_premium = df_costs.iloc[[
                                       # 140, 160, 295, 327, 353,  # 2020
-                                      596, 599, 610, 620, 622,  # 2021
+                                      596, 599, 610, 620, 622,   # 2021
                                       651, 709, 777, 789, 824,   # 2021
                                       836, 867, 895, 905, 960,   # 2021
-                                      966, 985]]  # 2021
-    # print(customers_premium)
+                                      966, 985, 1101, 1131, 1150,
+                                      1159]]  # 2021
+    print(customers_premium)
     customers_premium.Kwota = customers_premium.Kwota * -1
 
     mg = df_costs[df_costs['Nadawca'].str.contains('MAGRO MACIEJ')]
@@ -158,7 +167,7 @@ def plot(db, df_bank):
     df_costs = df_costs[df_costs['Data nowa'] > pd.to_datetime('2020-12')]
     print(f'Suma Kosztów z konta: {df_costs.Kwota.sum()} zł')
 
-    print(f'\nInkaso minus Koszty: {df_income2["TU Inkaso"].sum() - df_costs.Kwota.sum()} zł')
+    print(f'\nInkaso minus Koszty: {df_income["TU Inkaso"].sum() - df_costs.Kwota.sum()} zł')
 
     x = df_costs['Data nowa']
     ax.xaxis.update_units(x)
@@ -179,7 +188,7 @@ if __name__ == '__main__':
 
     # file = "/run/user/1000/gvfs/smb-share:server=192.168.1.12,share=e/Agent baza/2014 BAZA MAGRO.xlsx"
     db_file = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
-    bank_statement = '/home/robb/Desktop/historia_2021-12-26_20109027050000000133736204.csv'
+    bank_statement = '/home/robb/Desktop/historia_2021-12-30_20109027050000000133736204.csv'
 
     engine = make_sql(db_file)
 
