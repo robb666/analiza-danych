@@ -146,9 +146,10 @@ def plot(db, df_bank):
                         (df_costs['Data nowa'] < pd.to_datetime('2021-12'))]
 
     income = df_income["TU Inkaso"].sum() - df_costs.Kwota.sum()
-    print(f"\nSuma Inkasa z Bazy: {df_income['TU Inkaso'].sum()} zł\n")
-    print(f'Suma Kosztów z konta: {df_costs.Kwota.sum()} zł')
-    print(f'\nInkaso minus Koszty: {income} zł')
+
+    print(f"""\nSuma Inkasa z Bazy: {df_income['TU Inkaso'].sum()} zł
+              \nSuma Kosztów z konta: {df_costs.Kwota.sum()} zł
+              \nInkaso minus Koszty: {income} zł""")
 
     ax.legend()
     ax.legend()
