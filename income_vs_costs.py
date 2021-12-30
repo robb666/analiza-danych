@@ -89,6 +89,10 @@ def plot(db, df_bank):
     df_income.dropna(subset=['TU nr rozlicz prowizji'], inplace=True)
     df_income['TU nr rozlicz prowizji'] = pd.to_datetime(df_income['TU nr rozlicz prowizji'], format='%y%m')
     df_income = df_income.groupby(['TU nr rozlicz prowizji']).sum().reset_index()
+    df_income = df_income[df_income['TU nr rozlicz prowizji'] < pd.to_datetime('2021-12')]
+
+    print(df_income)
+
 
     df_income['TU Inkaso'] = df_income['TU Inkaso'].fillna(0).astype(int)
     x = df_income['TU nr rozlicz prowizji']
@@ -107,24 +111,19 @@ def plot(db, df_bank):
     df_bank.Kwota = df_bank.Kwota.replace({',': '.'}, regex=True)
     df_bank.Kwota = df_bank.Kwota.astype(float)
 
-
-    # print(customers_premium)
-
     df_bank['Data nowa'] = df_bank['Data księgowania'].apply(lambda x: x[3:])
 
     df_costs = df_bank[['Data nowa', 'Nadawca', 'Kwota']]
     df_costs['Nadawca'] = df_costs['Nadawca'].fillna('bez tyt.')
 
-    print(df_costs)
-
     customers_premium = df_costs.iloc[[
-                                      # 140, 160, 295, 327, 353,  # 2020
-                                      596, 599, 610, 620, 622,   # 2021
-                                      651, 709, 777, 789, 824,   # 2021
-                                      836, 867, 895, 905, 960,   # 2021
-                                      966, 985, 1101, 1131, 1150,
-                                      1159]]  # 2021
-    print(customers_premium)
+                                          # 140, 160, 295, 327, 353,  # 2020
+                                          596, 599, 610, 620, 622,   # 2021
+                                          651, 709, 777, 789, 824,   # 2021
+                                          836, 867, 895, 905, 960,   # 2021
+                                          966, 985, 1101, 1131, 1150,
+                                          1159]]  # 2021
+
     customers_premium.Kwota = customers_premium.Kwota * -1
 
     mg = df_costs[df_costs['Nadawca'].str.contains('MAGRO MACIEJ')]
@@ -133,19 +132,17 @@ def plot(db, df_bank):
     df_costs = df_costs[df_costs['Kwota'] < 0]
     df_costs.Kwota = df_costs.Kwota * -1
 
-
-
-
     df_costs = pd.concat([df_costs, mg, customers_premium], axis=1, ignore_index=False)
     df_costs = df_costs.groupby(df_costs.columns, axis=1).sum()
-    # print(df_costs)
 
     df_costs = df_costs.groupby(['Data nowa']).sum().reset_index()
     df_costs.Kwota = df_costs.Kwota.astype(int)
 
     df_costs['Data nowa'] = pd.to_datetime(df_costs['Data nowa'])
     df_costs = df_costs.sort_values('Data nowa')
-    df_costs = df_costs[df_costs['Data nowa'] > pd.to_datetime('2020-12')]
+    df_costs = df_costs[(pd.to_datetime('2020-12') < df_costs['Data nowa']) &
+                        (df_costs['Data nowa'] < pd.to_datetime('2021-12'))]
+    
     print(f'Suma Kosztów z konta: {df_costs.Kwota.sum()} zł')
 
     print(f'\nInkaso minus Koszty: {df_income["TU Inkaso"].sum() - df_costs.Kwota.sum()} zł')
