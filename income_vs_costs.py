@@ -65,25 +65,14 @@ def read_bank(file):
 def plot(db, df_bank):
     pd.options.mode.chained_assignment = None
 
-    april_2020 = 10612  # wiersz od czasu rozliczeń tylko na Spółkę
-    december_2020 = 12555  # rok 2021
-    november_2021 = 15053  # cofnicie sie do oplaconych skladek
-
     df_income = db[
-                      (db['Rok rozlicz nr PERITUS'].str.contains('_21', na=False))
+                      # (db['Rok rozlicz nr PERITUS'].str.contains('_21', na=False))
+                      (db['Rok rozlicz nr PERITUS'].str.contains('|'.join(['_20', '_21']), na=False))
     ]
 
     print(df_income['TU Inkaso'].sum())
 
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
-
-    # ax = sns.regplot(x=df_magro.index,
-    #                  y=df_magro.Przypis,
-    #                  scatter=None,
-    #                  order=2,
-    #                  scatter_kws={'s': 10, 'alpha': 0.4},
-    #                  line_kws={'lw': 1, 'color': 'g'})
-
 
     df_income['TU nr rozlicz prowizji'] = df_income['TU nr rozlicz prowizji'].str.extract('\w+(\d{4})')
     df_income.dropna(subset=['TU nr rozlicz prowizji'], inplace=True)
@@ -91,22 +80,18 @@ def plot(db, df_bank):
     df_income = df_income.groupby(['TU nr rozlicz prowizji']).sum().reset_index()
     df_income = df_income[df_income['TU nr rozlicz prowizji'] < pd.to_datetime('2021-12')]
 
-    print(df_income)
-
-
     df_income['TU Inkaso'] = df_income['TU Inkaso'].fillna(0).astype(int)
     x = df_income['TU nr rozlicz prowizji']
 
-    print(f"\nSuma Inkasa z Bazy: {df_income['TU Inkaso'].sum()} zł\n")
     ax.xaxis.update_units(x)
 
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='TU Inkaso',
-                     # scatter=None,
                      data=df_income,
                      order=2,
-                     scatter_kws={'s': 10, 'alpha': 0.4},
-                     line_kws={'lw': 1, 'color': 'g'})
+                     scatter_kws={'s': 10, 'alpha': 0.4, 'color': 'green'},
+                     line_kws={'lw': 1, 'color': 'green'},
+                     label="Przychody")
 
     df_bank.Kwota = df_bank.Kwota.replace({',': '.'}, regex=True)
     df_bank.Kwota = df_bank.Kwota.astype(float)
@@ -117,7 +102,7 @@ def plot(db, df_bank):
     df_costs['Nadawca'] = df_costs['Nadawca'].fillna('bez tyt.')
 
     customers_premium = df_costs.iloc[[
-                                          # 140, 160, 295, 327, 353,  # 2020
+                                          140, 160, 295, 327, 353,  # 2020
                                           596, 599, 610, 620, 622,   # 2021
                                           651, 709, 777, 789, 824,   # 2021
                                           836, 867, 895, 905, 960,   # 2021
@@ -140,12 +125,8 @@ def plot(db, df_bank):
 
     df_costs['Data nowa'] = pd.to_datetime(df_costs['Data nowa'])
     df_costs = df_costs.sort_values('Data nowa')
-    df_costs = df_costs[(pd.to_datetime('2020-12') < df_costs['Data nowa']) &
+    df_costs = df_costs[(pd.to_datetime('2020-04') < df_costs['Data nowa']) &
                         (df_costs['Data nowa'] < pd.to_datetime('2021-12'))]
-
-    print(f'Suma Kosztów z konta: {df_costs.Kwota.sum()} zł')
-
-    print(f'\nInkaso minus Koszty: {df_income["TU Inkaso"].sum() - df_costs.Kwota.sum()} zł')
 
     x = df_costs['Data nowa']
     ax.xaxis.update_units(x)
@@ -153,17 +134,30 @@ def plot(db, df_bank):
     ax = sns.regplot(x=ax.xaxis.convert_units(x),
                      y='Kwota',
                      data=df_costs,
-                     # scatter=None,
                      order=2,
-                     scatter_kws={'s': 10, 'alpha': 0.4},
-                     line_kws={'lw': 1, 'color': 'r'})
+                     scatter_kws={'s': 10, 'alpha': 0.4, 'color': 'red'},
+                     line_kws={'lw': 1, 'color': 'r'},
+                     label='Koszty')
 
-    # ax.set_xticklabels(df_bank['Data księgowania'], rotation=45)
+    df_income = df_income[(df_income['TU nr rozlicz prowizji'] > pd.to_datetime('2020-12')) &
+                          (df_income['TU nr rozlicz prowizji'] < pd.to_datetime('2021-12'))]
+
+    df_costs = df_costs[(df_costs['Data nowa'] > pd.to_datetime('2020-12')) &
+                        (df_costs['Data nowa'] < pd.to_datetime('2021-12'))]
+
+    income = df_income["TU Inkaso"].sum() - df_costs.Kwota.sum()
+    print(f"\nSuma Inkasa z Bazy: {df_income['TU Inkaso'].sum()} zł\n")
+    print(f'Suma Kosztów z konta: {df_costs.Kwota.sum()} zł')
+    print(f'\nInkaso minus Koszty: {income} zł')
+
+    ax.legend()
+    ax.legend()
+    ax.set_title('Pównanie przychodów z Bazy _20, _21 i kosztów od 05.2020 (tylko Spółka bez jdg).\n\n'
+                 f'Dochód w 2021 bez grudnia = {income} zł')
     plt.show()
 
 
 if __name__ == '__main__':
-
     # file = "/run/user/1000/gvfs/smb-share:server=192.168.1.12,share=e/Agent baza/2014 BAZA MAGRO.xlsx"
     db_file = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
     bank_statement = '/home/robb/Desktop/historia_2021-12-30_20109027050000000133736204.csv'
