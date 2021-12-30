@@ -76,8 +76,6 @@ def plot(db, df_bank):
     print(df_income['TU Inkaso'].sum())
 
     sns.set(rc={'figure.figsize': (29, 7)});fig, ax = plt.subplots();fig.autofmt_xdate()
-    # plt.gca().set(xlim=(0, 15249))
-    # print(df_magro.index)
 
     # ax = sns.regplot(x=df_magro.index,
     #                  y=df_magro.Przypis,
@@ -86,31 +84,15 @@ def plot(db, df_bank):
     #                  scatter_kws={'s': 10, 'alpha': 0.4},
     #                  line_kws={'lw': 1, 'color': 'g'})
 
-    # print(df_magro.head())
-
-    # df_income2 = df_income[['Data wystawienia', 'TU Inkaso']]
-    # df_income2['Data nowa'] = df_income2['Data wystawienia'].fillna('2021-04-27')
-    # df_magro2.loc[666:, ('Data nowa')] = '2021-04-27'
-    # df_income2['Data nowa'] = df_income2['Data nowa'].apply(lambda x: x[:-3])
 
     df_income['TU nr rozlicz prowizji'] = df_income['TU nr rozlicz prowizji'].str.extract('\w+(\d{4})')
     df_income.dropna(subset=['TU nr rozlicz prowizji'], inplace=True)
-    df_income['TU nr rozlicz prowizji'] = pd.to_datetime(df_income['TU nr rozlicz prowizji']).dt.strftime('%y%m')
-
-    print(df_income['TU nr rozlicz prowizji'])
-
-
-
-    # df_income2['Data nowa'] = pd.to_datetime(df_income2['Data nowa'])
-    # df_income2 = df_income2.groupby(['Data nowa']).sum().reset_index()
-
-    # df_income2 = df_income2[(df_income2['Data nowa'] > pd.to_datetime('2020-12')) &
-    #                       (df_income2['Data nowa'] < pd.to_datetime('2022-01'))]
+    df_income['TU nr rozlicz prowizji'] = pd.to_datetime(df_income['TU nr rozlicz prowizji'], format='%y%m')
+    df_income = df_income.groupby(['TU nr rozlicz prowizji']).sum().reset_index()
 
     df_income['TU Inkaso'] = df_income['TU Inkaso'].fillna(0).astype(int)
-    # print(df_income2)
-    x = df_income['Data wystawienia']
-    # print(df_magro2)
+    x = df_income['TU nr rozlicz prowizji']
+
     print(f"\nSuma Inkasa z Bazy: {df_income['TU Inkaso'].sum()} zł\n")
     ax.xaxis.update_units(x)
 
@@ -121,7 +103,6 @@ def plot(db, df_bank):
                      order=2,
                      scatter_kws={'s': 10, 'alpha': 0.4},
                      line_kws={'lw': 1, 'color': 'g'})
-    plt.show()
 
     df_bank.Kwota = df_bank.Kwota.replace({',': '.'}, regex=True)
     df_bank.Kwota = df_bank.Kwota.astype(float)
@@ -148,7 +129,7 @@ def plot(db, df_bank):
 
     mg = df_costs[df_costs['Nadawca'].str.contains('MAGRO MACIEJ')]
     mg.Kwota = mg.Kwota * -1
-    # print(mg.Kwota)
+
     df_costs = df_costs[df_costs['Kwota'] < 0]
     df_costs.Kwota = df_costs.Kwota * -1
 
