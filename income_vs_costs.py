@@ -1,12 +1,10 @@
 import os
-import numpy as np
 from sqlalchemy import create_engine
 import pandas as pd
 from sqlalchemy import Date
 from sqlalchemy import Integer
 import matplotlib.pyplot as plt
 import seaborn as sns
-from datetime import datetime
 
 
 pd.set_option('display.max_rows', None)
@@ -102,12 +100,12 @@ def plot(db, df_bank):
     df_costs['Nadawca'] = df_costs['Nadawca'].fillna('bez tyt.')
 
     customers_premium = df_costs.iloc[[
-                                          140, 160, 295, 327, 353,  # 2020
+                                          140, 160, 295, 327, 353,   # 2020
                                           596, 599, 610, 620, 622,   # 2021
                                           651, 709, 777, 789, 824,   # 2021
                                           836, 867, 895, 905, 960,   # 2021
-                                          966, 985, 1101, 1131, 1150,
-                                          1159]]  # 2021
+                                          966, 985, 1101, 1131, 1150,# 2021
+                                          1159]]                     # 2021
 
     customers_premium.Kwota = customers_premium.Kwota * -1
 
@@ -125,7 +123,7 @@ def plot(db, df_bank):
 
     df_costs['Data nowa'] = pd.to_datetime(df_costs['Data nowa'])
     df_costs = df_costs.sort_values('Data nowa')
-    df_costs = df_costs[(pd.to_datetime('2020-04') < df_costs['Data nowa']) &
+    df_costs = df_costs[(df_costs['Data nowa'] > pd.to_datetime('2020-04')) &
                         (df_costs['Data nowa'] < pd.to_datetime('2021-12'))]
 
     x = df_costs['Data nowa']
@@ -147,9 +145,10 @@ def plot(db, df_bank):
 
     income = df_income["TU Inkaso"].sum() - df_costs.Kwota.sum()
 
-    print(f"""\nSuma Inkasa z Bazy: {df_income['TU Inkaso'].sum()} zł
-              \nSuma Kosztów z konta: {df_costs.Kwota.sum()} zł
-              \nInkaso minus Koszty: {income} zł""")
+    print(f"""
+    \nSuma Inkasa z Bazy: {df_income['TU Inkaso'].sum()} zł
+    \nSuma Kosztów z konta: {df_costs.Kwota.sum()} zł
+    \nInkaso minus Koszty: {income} zł""")
 
     ax.legend()
     ax.legend()
