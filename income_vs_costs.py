@@ -158,8 +158,8 @@ def plot(db, df_bank):
 
 
 if __name__ == '__main__':
-    # file = "/run/user/1000/gvfs/smb-share:server=192.168.1.12,share=e/Agent baza/2014 BAZA MAGRO.xlsx"
-    db_file = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
+    # file = "/run/user/1000/gvfs/smb-share:server=192.168.1.12,share=e/Agent baza/2014 BAZA MAGRO.xlsm"
+    db_file = '/home/robb/Desktop/2014 BAZA MAGRO.xlsm'
     bank_statement = '/home/robb/Desktop/historia_2021-12-30_20109027050000000133736204.csv'
 
     engine = make_sql(db_file)

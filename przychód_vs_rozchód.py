@@ -15,7 +15,7 @@ desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
 def sorting():
 
     xlApp = Dispatch("Excel.Application")
-    xlwb = xlApp.Workbooks.Open(desktop + "\\2014 BAZA MAGRO.xlsx", False, False, None)
+    xlwb = xlApp.Workbooks.Open(desktop + "\\2014 BAZA MAGRO.xlsm", False, False, None)
     xlAscending = 1
     xlSortColumns = 1
     xlYes = 2
@@ -23,14 +23,14 @@ def sorting():
                                     Header=xlYes, Orientation=xlSortColumns)
     path = ''.join([desktop])
     xlApp.DisplayAlerts = False
-    xlwb.SaveAs(path + '\\MODIFY.xlsx')
+    xlwb.SaveAs(path + '\\MODIFY.xlsm')
     xlApp.DisplayAlerts = True
     xlwb.Close()
 
 
 def odczytDanychBaza():
 
-    wb = load_workbook(desktop + "\\MODIFY.xlsx", read_only=True, data_only=True)
+    wb = load_workbook(desktop + "\\MODIFY.xlsm", read_only=True, data_only=True)
     ws = wb['BAZA 2014']
     shit = ws['BB5:CU19000']
 
@@ -54,7 +54,7 @@ def odczytDanychBaza():
 
 
 def odczytDanychBank():
-    wb = load_workbook("M:/FIRMA MAGRO/BANKI/BZ WBK/HISTORIA/szablon_historia1.xlsx", read_only=True, data_only=True)
+    wb = load_workbook("M:/FIRMA MAGRO/BANKI/BZ WBK/HISTORIA/szablon_historia1.xlsm", read_only=True, data_only=True)
     ws = wb['historia_rachunku']
     shit = ws['A1:H1200']
 

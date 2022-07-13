@@ -10,7 +10,7 @@ import re
 desktop = '/home/robb/Desktop'  # Ubuntu
 
 def odczyt_excela():
-    wb = load_workbook(desktop + "/2014 BAZA MAGRO.xlsx", read_only=False, data_only=True)
+    wb = load_workbook(desktop + "/2014 BAZA MAGRO.xlsm", read_only=False, data_only=True)
     ws = wb['BAZA 2014']
     OWCA = ws['G']
     nazwisko_col = ws['L']

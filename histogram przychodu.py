@@ -14,7 +14,7 @@ desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
 
 def sorting():
     xlApp = Dispatch("Excel.Application")
-    xlwb = xlApp.Workbooks.Open(desktop + "\\2014 BAZA MAGRO.xlsx", False, False, None)
+    xlwb = xlApp.Workbooks.Open(desktop + "\\2014 BAZA MAGRO.xlsm", False, False, None)
     xlAscending = 1
     xlSortColumns = 1
     xlYes = 2
@@ -22,14 +22,14 @@ def sorting():
                                     Header=xlYes, Orientation=xlSortColumns)
     path = ''.join([desktop])
     xlApp.DisplayAlerts = False
-    xlwb.SaveAs(path + '\\MODIFY.xlsx')
+    xlwb.SaveAs(path + '\\MODIFY.xlsm')
     xlApp.DisplayAlerts = True
     xlwb.Close()
     xlApp = None
 
 
 def odczytDanych():
-    wb = load_workbook(desktop + "\\MODIFY.xlsx", read_only=False, data_only=True)
+    wb = load_workbook(desktop + "\\MODIFY.xlsm", read_only=False, data_only=True)
     # ws = wb['Arkusz1']
     ws = wb['BAZA 2014']
     BY = ws['BY']

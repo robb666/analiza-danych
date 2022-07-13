@@ -307,9 +307,9 @@ def brak_inkaso(df):
 
 
 if __name__ == '__main__':
-    # file = "/run/user/1000/gvfs/smb-share:server=192.168.1.12,share=e/Agent baza/2014 BAZA MAGRO.xlsx"
-    excel = '/home/robb/Desktop/2014 BAZA MAGRO.xlsx'
-    output = 'output.xlsx'
+    # file = "/run/user/1000/gvfs/smb-share:server=192.168.1.12,share=e/Agent baza/2014 BAZA MAGRO.xlsm"
+    excel = '/home/robb/Desktop/2014 BAZA MAGRO.xlsm'
+    output = 'output.xlsm'
 
     engine = make_sql(excel)
     sql_df = pd.read_sql('Select * from baza', engine)
